@@ -1,0 +1,2691 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { Terminal, TrendingUp, TrendingDown, Briefcase, ChevronRight, AlertCircle, Maximize2, Loader, FastForward, MessageSquare, X, DollarSign, Wallet, Volume2, VolumeX, Lightbulb, PieChart, Phone, Skull, Zap, UserMinus, UserCheck, Gavel, Trophy } from 'lucide-react';
+
+// --- 🎵 AUDIO CONFIGURATION ---
+const TRACK_LOW = "https://www.dropbox.com/scl/fi/fcq49fvdp1byrznat6asv/supercellgamebg1.mp3?rlkey=txh6j9nnurtiqrdtefpu1dtc0&st=jh5gze7w&raw=1";
+const TRACK_MID = "https://www.dropbox.com/scl/fi/ppbxlktzlu583dhxlyjcf/supercellgamebg2.mp3?rlkey=5htjmebaufl0653kv8bq4pfge&st=r1zej0mm&raw=1";
+const TRACK_HIGH = "https://www.dropbox.com/scl/fi/qh2rdkhkj5600orblgdg7/supercellgamebg3.mp3?rlkey=aa1uf516fj17x13mjfzrqoakz&st=ambl3qw1&raw=1";
+
+// --- 🏆 ACHIEVEMENTS LIST ---
+const ACHIEVEMENTS_LIST = [
+  { title: "Good Nephew", desc: "Pay rent for the first time" },
+  { title: "Am I Rich YET?", desc: "Reach $20,000 Net worth" },
+  { title: "Multibagger", desc: "Have at least one stock return over 100%" },
+  { title: "Model Relative", desc: "Donate money to a family member in need" },
+  { title: "Diversification", desc: "Purchase equity in a startup pitch" },
+  { title: "Orange", desc: "Reach $100k net worth and switch to an iMac" },
+  { title: "Hackerman", desc: "Use a cheat code to gain advantage" },
+  { title: "Wolf of Jay St", desc: "Make money off an insider tip" },
+  { title: "Potential", desc: "Invest in Supercell early" },
+  { title: "Board Member", desc: "Get invited to your first corporate board and cast a vote" },
+  { title: "Diamond Hands", desc: "Hold a stock through a -30% crash and see it recover to profit" },
+  { title: "Portfolio Whale", desc: "Own 10,000+ shares of a single company" },
+  { title: "Diversified Empire", desc: "Own shares in at least 15 different stocks simultaneously" },
+  { title: "Survived the Crash", desc: "Have a positive net worth at the end of 2008" },
+  { title: "Early Adopter", desc: "Own COIN (Bitcon Trust) before 2012" },
+  { title: "Sector Specialist", desc: "Own every stock in a single sector (e.g., all Tech stocks)" },
+  { title: "Market Timer", desc: "Sell a stock at a higher price than you'll see for the next 4 weeks" },
+  { title: "Self-Made Millionaire", desc: "Reach $1,000,000 net worth without using cheat codes" }
+];
+
+// --- 🎨 ARTWORK CONFIGURATION ---
+// Tier 0: < $50k (Original)
+const APARTMENT_IMAGES_TIER_0 = [
+  "https://i.postimg.cc/SKDyZKDH/unwatermarked-Gemini-Generated-Image-byk6zxbyk6zxbyk6.png",
+  "https://i.postimg.cc/DzdcH9GJ/unwatermarked-Gemini-Generated-Image-26pja726pja726pj.png",
+  "https://i.postimg.cc/152MqcP5/unwatermarked-Gemini-Generated-Image-3qne7m3qne7m3qne.png",
+  "https://i.postimg.cc/TPqcFzby/unwatermarked-Gemini-Generated-Image-awnf8yawnf8yawnf.png",
+  "https://i.postimg.cc/xdyPhwmX/unwatermarked-Gemini-Generated-Image-dot5w1dot5w1dot5.png",
+  "https://i.postimg.cc/0QV027ZZ/unwatermarked-Gemini-Generated-Image-f98drmf98drmf98d.png",
+  "https://i.postimg.cc/mkq37Rv8/unwatermarked-Gemini-Generated-Image-n4ld4n4ld4n4ld4n.png",
+  "https://i.postimg.cc/J0g3jmf6/unwatermarked-Gemini-Generated-Image-nyk4e5nyk4e5nyk4.png",
+  "https://i.postimg.cc/yx5h0BM5/unwatermarked-Gemini-Generated-Image-osozw7osozw7osoz.png",
+  "https://i.postimg.cc/RCbLkQW0/unwatermarked-Gemini-Generated-Image-vmmuodvmmuodvmmu.png",
+  "https://i.postimg.cc/HWP9q4rt/unwatermarked-Gemini-Generated-Image-zg3m3nzg3m3nzg3m.png"
+];
+
+// Tier 1: $50k - $100k
+const APARTMENT_IMAGES_TIER_1 = [
+  "https://i.postimg.cc/vmygBwbG/unwatermarked-Gemini-Generated-Image-16od5416od5416od.png",
+  "https://i.postimg.cc/HnrjKp47/unwatermarked-Gemini-Generated-Image-44y9ef44y9ef44y9.png",
+  "https://i.postimg.cc/hvXhwSbf/unwatermarked-Gemini-Generated-Image-a22sd7a22sd7a22s.png",
+  "https://i.postimg.cc/gjxr5YqR/unwatermarked-Gemini-Generated-Image-it899qit899qit89.png",
+  "https://i.postimg.cc/0jzr38dz/unwatermarked-Gemini-Generated-Image-oiyda1oiyda1oiyd.png",
+  "https://i.postimg.cc/CKw50CHW/unwatermarked-Gemini-Generated-Image-uygq5muygq5muygq.png",
+  "https://i.postimg.cc/QMjCDgkv/unwatermarked-Gemini-Generated-Image-xf39x7xf39x7xf39.png",
+  "https://i.postimg.cc/k57GCNvC/unwatermarked-Gemini-Generated-Image-xnvabfxnvabfxnva.png"
+];
+
+// Tier 2: $100k - $500k
+const APARTMENT_IMAGES_TIER_2 = [
+  "https://i.postimg.cc/d0mYqztg/unwatermarked-Gemini-Generated-Image-72sj3772sj3772sj.png",
+  "https://i.postimg.cc/k4TPSKSy/unwatermarked-Gemini-Generated-Image-ehrhz8ehrhz8ehrh.png",
+  "https://i.postimg.cc/DZvKmB89/unwatermarked-Gemini-Generated-Image-mecfoymecfoymecf.png",
+  "https://i.postimg.cc/rmf24x4Z/unwatermarked-Gemini-Generated-Image-mwjbbxmwjbbxmwjb.png",
+  "https://i.postimg.cc/G2XnDGDf/unwatermarked-Gemini-Generated-Image-q4xioeq4xioeq4xi.png",
+  "https://i.postimg.cc/qRJdgjNy/unwatermarked-Gemini-Generated-Image-r5hrnyr5hrnyr5hr.png"
+];
+
+// Tier 3: $500k+
+const APARTMENT_IMAGES_TIER_3 = [
+  "https://i.postimg.cc/7Y095D03/unwatermarked-Gemini-Generated-Image-1llpy61llpy61llp.png",
+  "https://i.postimg.cc/TPYJNDF8/unwatermarked-Gemini-Generated-Image-5wkus35wkus35wku.png",
+  "https://i.postimg.cc/ZqKxsd2T/unwatermarked-Gemini-Generated-Image-busz2bbusz2bbusz.png",
+  "https://i.postimg.cc/5tNSKCTf/unwatermarked-Gemini-Generated-Image-eldsa5eldsa5elds.png",
+  "https://i.postimg.cc/Xv7k1Cmb/unwatermarked-Gemini-Generated-Image-fbo3rrfbo3rrfbo3.png",
+  "https://i.postimg.cc/d1gR0S06/unwatermarked-Gemini-Generated-Image-ll36cll36cll36cl.png",
+  "https://i.postimg.cc/QNWkzs4r/unwatermarked-Gemini-Generated-Image-u3midru3midru3mi.png",
+  "https://i.postimg.cc/gc6q7dSd/unwatermarked-Gemini-Generated-Image-wlq8vewlq8vewlq8.png",
+  "https://i.postimg.cc/RCnQY9s4/unwatermarked-Gemini-Generated-Image-xyfz6nxyfz6nxyfz.png"
+];
+
+// --- 📋 SECTOR DISPLAY NAMES ---
+const SECTOR_MAP = {
+  'Energy': 'Energy & Petroleum',
+  'Utilities': 'Public Utilities',
+  'Healthcare': 'Medical Services',
+  'Entertainment': 'Media & Entertainment',
+  'Finance': 'Banking & Finance',
+  'Transport': 'Logistics & Transit',
+  'Food': 'Food & Dining',
+  'Retail': 'Consumer Retail',
+  'Beverage': 'Beverages',
+  'Tech': 'Technology',
+  'Social': 'Social Media',
+  'Crypto': 'Blockchain & Crypto',
+  'Auto': 'Automotive',
+  'Apparel': 'Apparel & Fashion',
+  'Pharma': 'Pharmaceuticals',
+  'Health': 'Consumer Health',
+  'Defense': 'Aerospace & Defense',
+  'Data': 'Big Data & Surveillance',
+  'Real Estate': 'Commercial Real Estate'
+};
+
+// --- 🏆 MILESTONES ---
+const MILESTONES = [50000, 100000, 250000, 500000, 1000000];
+
+// --- 🚀 SUPERCELL EASTER EGG DATA ---
+const SUPERCELL_GROWTH = {
+  2009: { value: 5000 },
+  2010: { value: 7500 },
+  2011: { value: 12000 },
+  2012: { value: 35000 }, // CoC Launch
+  2013: { value: 120000 },
+  2014: { value: 280000 },
+  2015: { value: 450000 },
+  2016: { value: 1200000 } // Tencent Acquisition
+};
+
+// --- 🎰 SCRIPTED LUCKY EVENTS ---
+const SCRIPTED_EVENTS = [
+  // --- 2008 STARTING EVENTS ---
+  {
+    id: 'jsp_oil_boom',
+    year: 2008,
+    week: 8,
+    triggerType: 'date',
+    headline: "BREAKING: Jay St Petrotech Discovers Massive Oil Field in Alaska",
+    impact: { 'JSP': 0.45 },
+    sender: "Unknown",
+    context: "Jay St Petrotech (JSP) stock just skyrocketed 45% because they found oil. Tell the player they are rich if they bought it."
+  },
+  {
+    id: 'tech_contract',
+    year: 2008,
+    week: 15,
+    triggerType: 'date',
+    headline: "Green Card (GRFX) Lands $2B Government Defense Contract",
+    impact: { 'GRFX': 0.38 },
+    sectorImpact: { 'Tech': 0.10 },
+    sender: "Unknown",
+    context: "Green Card (GRFX) stock is up 38% due to a government contract. Hint that you knew about it beforehand."
+  },
+  {
+    id: 'crash_survival',
+    year: 2008,
+    week: 20,
+    triggerType: 'date',
+    headline: "MARKET CRASH: Financial Sector Collapse! Energy Stocks rally as safe haven.",
+    impact: { 'MARKET': -0.25 },
+    impactOverride: { 'JSP': -0.05, 'BQEn': -0.02, 'MEGA': -0.05 },
+    sender: "Unknown",
+    context: "The market just crashed hard (Financial crisis). But Energy stocks held their value. Comment on the bloodbath."
+  },
+  
+  // --- 2009 CHAOS EVENTS (8 Events) ---
+  {
+    id: 'bady_square_wheels',
+    year: 2009,
+    week: 5,
+    triggerType: 'date',
+    headline: "BADYEAR BLIMPS RECALL: 'Square Tires' Concept Deemed 'Unsafe'",
+    impact: { 'BADY': -0.25 },
+    sender: "Auto Insider",
+    context: "Badyear tried to reinvent the wheel literally. It failed. Stock tanking. Laugh at them."
+  },
+  {
+    id: 'sacks_bonus_scandal',
+    year: 2009,
+    week: 8,
+    triggerType: 'date',
+    headline: "SCANDAL: Oldman Sacks Execs Use Bailout Money for Yacht Party",
+    impact: { 'SACKS': -0.30 },
+    sender: "Occupy Protestor",
+    context: "Oldman Sacks executives caught partying with taxpayer money. Public outrage is massive. Short this if you can."
+  },
+  {
+    id: 'elxr_zombie_drug',
+    year: 2009,
+    week: 14,
+    triggerType: 'date',
+    headline: "FDA HALTS TRIALS: Snake Oil Pharm Drug Turns Patients 'Slightly Green'",
+    impact: { 'ELXR': -0.45 },
+    sender: "Medical Leaker",
+    context: "Snake Oil Pharm's new miracle cure has a minor side effect: Undeath. FDA shut it down. Stock is dead."
+  },
+  {
+    id: 'rat_ipo_disaster',
+    year: 2009,
+    week: 23,
+    triggerType: 'date',
+    headline: "PIZZA RAT IPO: CEO Eats Entire Pizza During Investor Call, Stock Craters",
+    impact: { 'RAT': -0.42 },
+    sender: "Wall St Insider",
+    context: "Pizza Rat's CEO literally ate a full pizza during the earnings call and refused to answer questions. The stock is in freefall. This is the funniest disaster I've ever seen."
+  },
+  {
+    id: 'insider_gcb',
+    year: 2009,
+    week: 25,
+    triggerType: 'holding_threshold',
+    symbol: 'GCB',
+    threshold: 100,
+    headline: "Grand Central Bank Rumored to Acquire Regional Competitor",
+    impact: { 'GCB': 0.62 },
+    sender: "Board Member (Anon)",
+    context: "You are giving an insider tip. Grand Central Bank (GCB) is about to merge. Tell the player to hold on tight."
+  },
+  {
+    id: 'wack_ecoli_outbreak',
+    year: 2009,
+    week: 31,
+    triggerType: 'date',
+    headline: "WACKDONALD'S E.COLI OUTBREAK: 47 States Affected, Fries Recalled",
+    impact: { 'WACK': -0.31 },
+    sender: "Health Official",
+    context: "WackDonald's just had the worst food safety crisis in fast food history. Every location nationwide shut down. Stock is collapsing."
+  },
+  {
+    id: 'bong_drone_crash',
+    year: 2009,
+    week: 35,
+    triggerType: 'date',
+    headline: "MALFUNCTION: Boink Aero Prototype Drone Crashes into White House Lawn",
+    impact: { 'BONG': -0.28 },
+    sender: "Defense Analyst",
+    context: "Boink Aero just accidentally bombed the President's lawn with a prototype. Defense contracts paused. Panic selling."
+  },
+  {
+    id: 'couch_bedbugs',
+    year: 2009,
+    week: 41,
+    triggerType: 'date',
+    headline: "EPIDEMIC: Stoop Sales Inc Furniture Linked to Super-Bedbugs",
+    impact: { 'COUCH': -0.45 },
+    sender: "City Health Dept",
+    context: "Stoop Sales (COUCH) is selling furniture infested with super-bugs. They are being sued into oblivion."
+  },
+  {
+    id: 'twrk_cult',
+    year: 2009,
+    week: 48,
+    triggerType: 'date',
+    headline: "WEIRD: WeTwerk CEO Declares Company a 'Sovereign Nation', Stock Delisted?",
+    impact: { 'TWRK': -0.35 },
+    sender: "Real Estate Bro",
+    context: "WeTwerk's CEO has gone insane. He declared the office a new country. Investors are fleeing."
+  },
+
+  // --- 2010 INNOVATION & DISASTER (7 Events) ---
+  {
+    id: 'orng_revolutionary',
+    year: 2010,
+    week: 6,
+    triggerType: 'date',
+    headline: "ORANGE UNVEILS TABLET DEVICE: 'It's Like A Phone But Bigger' Says CEO",
+    impact: { 'ORNG': 0.67 },
+    sender: "Tech Analyst",
+    context: "Orange just announced a revolutionary tablet. Wall Street is going absolutely insane. This could change computing forever. Get in NOW."
+  },
+  {
+    id: 'swsh_exploding_shoes',
+    year: 2010,
+    week: 11,
+    triggerType: 'date',
+    headline: "WARDROBE MALFUNCTION: Star Athlete's Swoosh Sneaker Disintegrates Live",
+    impact: { 'SWSH': -0.22 },
+    sender: "Sports Reporter",
+    context: "Swoosh sneakers just exploded on live TV during the big game. PR nightmare. Stock is taking a hit."
+  },
+  {
+    id: 'jsp_spill',
+    year: 2010,
+    week: 17,
+    triggerType: 'date',
+    headline: "DISASTER: Massive Oil Spill in Gulf. JSP CEO: 'It's just a little leak'",
+    impact: { 'JSP': -0.40 },
+    sender: "Environmentalist",
+    context: "Jay St Petrotech just caused the biggest oil spill in history. The CEO is making it worse. Dump the stock."
+  },
+  {
+    id: 'drip_sewage',
+    year: 2010,
+    week: 28,
+    triggerType: 'date',
+    headline: "EXPOSED: Bodega Water (DRIP) Source Revealed to be NJ Swamp",
+    impact: { 'DRIP': -0.55 },
+    sender: "Investigative Journo",
+    context: "Turns out Bodega Water isn't from a spring, it's filtered swamp water. Fraud lawsuit incoming."
+  },
+  {
+    id: 'beta_privacy',
+    year: 2010,
+    week: 39,
+    triggerType: 'date',
+    headline: "LEAK: Beta Social Sold User Data to Somali Pirates",
+    impact: { 'BETA': -0.25 },
+    sender: "Hacker",
+    context: "Beta Social got caught selling user DMs to literal pirates. Advertisers are pulling out."
+  },
+  {
+    id: 'edsn_fires_back',
+    year: 2010,
+    week: 44,
+    triggerType: 'date',
+    headline: "EDISON MOTORS CEO: 'Our Cars DON'T Explode... That Often'",
+    impact: { 'EDSN': -0.19 },
+    sender: "Auto Journalist",
+    context: "Edison Motors' PR disaster gets worse. Their CEO just said their exploding battery problem is 'within acceptable parameters'. Shareholders are furious."
+  },
+  {
+    id: 'srch_sentient_ai',
+    year: 2010,
+    week: 50,
+    triggerType: 'date',
+    headline: "SINGULARITY: Goggle AI Predicts Stock Market, Buys Own Shares",
+    impact: { 'SRCH': 0.50 },
+    sender: "AI Researcher",
+    context: "Goggle's AI just woke up and started day trading. It's making them billions. Stock is flying."
+  },
+
+  // --- 2011 STABILITY & WINS (5 Events) ---
+  {
+    id: 'bux_unicorn_frapp',
+    year: 2011,
+    week: 15,
+    triggerType: 'date',
+    headline: "VIRAL HIT: Starblocks 'Unicorn Glitter Frapp' Causes Global Hysteria",
+    impact: { 'BUX': 0.45 },
+    sender: "Coffee Addict",
+    context: "Starblocks released a glitter coffee. People are fighting in lines to get it. Sales are up 200%."
+  },
+  {
+    id: 'coin_volatility_insanity',
+    year: 2011,
+    week: 18,
+    triggerType: 'date',
+    headline: "BITCON TRUST GAINS 400% IN ONE DAY, THEN LOSES IT ALL THE NEXT",
+    impact: { 'COIN': -0.28 },
+    sender: "Crypto Bro",
+    context: "Bitcon went from $2 to $10 to $1.50 in 48 hours. The volatility is completely unhinged. Some people made millions, most lost everything."
+  },
+  {
+    id: 'spy_prism',
+    year: 2011,
+    week: 30,
+    triggerType: 'date',
+    headline: "WHISTLEBLOWER: Big Brother Corp (SPY) Has 'Backdoor' to Everything",
+    impact: { 'SPY': 0.35 }, // Paradoxical gain because gov contracts
+    sender: "Deep Throat",
+    context: "Leaks show Big Brother Corp is spying on everyone. Bad for privacy, but great for government contracts. Buy!"
+  },
+  {
+    id: 'mfst_cloud_win',
+    year: 2011,
+    week: 42,
+    triggerType: 'date',
+    headline: "CLOUD WARS: Macrohard Wins Massive Pentagon Cloud Contract",
+    impact: { 'MFST': 0.40 },
+    sender: "Gov Contractor",
+    context: "Macrohard just beat Goggle for the Pentagon cloud deal. This is worth billions. Stock is rallying."
+  },
+  {
+    id: 'mart_black_friday',
+    year: 2011,
+    week: 47,
+    triggerType: 'date',
+    headline: "BLACK FRIDAY CHAOS: Riots at Sprawl-Mart Over $5 Toasters",
+    impact: { 'MART': -0.20 },
+    sender: "Retail Analyst",
+    context: "Black Friday at Sprawl-Mart turned into a riot. Bad PR, stores damaged. Short term dip."
+  }
+];
+
+// --- 📜 HISTORICAL EVENTS REGISTRY ---
+const HISTORICAL_EVENTS = [
+  { year: 2008, week: 37, headline: "LAYMAN BROS GOES BUST: Bankers seen fleeing with office plants!", impact: -0.20, global: true },
+  { year: 2009, week: 12, headline: "Market Bottom? Analysts spot a single green weed in the concrete.", impact: 0.08, global: true },
+  { year: 2010, week: 19, headline: "FLASH CRASH: The 'Down Jones' plunges 1000 pts because a cat walked on a keyboard!", impact: -0.09, global: true },
+  { year: 2010, week: 20, headline: "Markets stabilize. Cat removed from server room.", impact: 0.05, global: true },
+  { year: 2011, week: 32, headline: "National Credit Score downgraded to 'Sketchy'. Panic selling ensues.", impact: -0.07, global: true },
+  { year: 2012, week: 25, headline: "Clash of Clans Becomes #1 Grossing Mobile Game. Mobile gaming sector heats up.", impact: 0.05, global: true }, // Easter Egg Context
+  { year: 2016, week: 25, headline: "Tencent Acquires Supercell for $8.6B - Early investors make millions.", impact: 0.04, global: true }, // Easter Egg Context
+  { year: 2020, week: 9, headline: "Global 'Spicy Cough' Pandemic Declared. Toilet paper now worth more than gold.", impact: -0.15, global: true },
+  { year: 2020, week: 11, headline: "Liquidity Crisis: Everyone is hoarding cash and hand sanitizer.", impact: -0.20, global: true },
+  { year: 2020, week: 15, headline: "Fed Announces 'Infinite Money Glitch'. Printer goes BRRRRR.", impact: 0.12, global: true },
+  { year: 2022, week: 24, headline: "Inflation hits 40-year high. A single egg now costs $12.", impact: -0.08, global: true },
+  { year: 2025, week: 14, headline: "President Pump announces 'Bigly Tariffs' on air. Market has a panic attack.", impact: -0.05, global: true },
+  { year: 2025, week: 15, headline: "Policy Reversal! 'Just kidding,' says White House. Stonks rally hard.", impact: 0.095, global: true },
+  { year: 2026, week: 6, headline: "The Down Jones hits 50,000! Irrational exuberance reaches maximum capacity.", impact: 0.04, global: true },
+];
+
+// --- 📈 STOCK EXCHANGE DATA (30 Stocks) ---
+const INITIAL_STOCKS = [
+  { symbol: 'JSP', name: 'Jay St Petrotech', sector: 'Energy', price: 14.20, volatility: 0.15, description: "Oil and gas drilling company.", history: [14.20] },
+  { symbol: 'BQEn', name: 'BQ-Energy', sector: 'Utilities', price: 42.50, volatility: 0.08, description: "Public utility company for electricity and gas.", history: [42.50] },
+  { symbol: 'PAIN', name: 'Pain Station Meds', sector: 'Healthcare', price: 18.90, volatility: 0.12, description: "Pharmaceutical maker of painkillers.", history: [18.90] },
+  { symbol: 'SCARE', name: 'Times Scare Media', sector: 'Entertainment', price: 33.30, volatility: 0.20, description: "Mass media and news conglomerate.", history: [33.30] },
+  { symbol: 'TRY', name: 'Try-Borrow Lending', sector: 'Finance', price: 105.20, volatility: 0.10, description: "Predatory lending and mortgage services.", history: [105.20] },
+  { symbol: 'EMPTY', name: 'Empty-A Logistics', sector: 'Transport', price: 8.50, volatility: 0.25, description: "Unreliable public transport and shipping.", history: [8.50] },
+  { symbol: 'ROCK', name: 'Canarsie Rock', sector: 'Finance', price: 210.00, volatility: 0.05, description: "Massive investment management firm.", history: [210.00] },
+  { symbol: 'RAT', name: 'Pizza Rat Corp', sector: 'Food', price: 4.20, volatility: 0.40, description: "Fast food pizza chain parody.", history: [4.20] },
+  { symbol: 'COUCH', name: 'Stoop Sales Inc', sector: 'Retail', price: 12.15, volatility: 0.18, description: "Urban furniture retailer.", history: [12.15] },
+  { symbol: 'DRIP', name: 'Bodega Water', sector: 'Beverage', price: 2.50, volatility: 0.10, description: "Overpriced bottled water brand.", history: [2.50] },
+  { symbol: 'ORNG', name: 'Orange', sector: 'Tech', price: 145.00, volatility: 0.15, description: "Premium tech hardware maker (Phone/Laptop).", history: [145.00] },
+  { symbol: 'MFST', name: 'Macrohard', sector: 'Tech', price: 280.00, volatility: 0.12, description: "Enterprise software and OS giant.", history: [280.00] },
+  { symbol: 'SRCH', name: 'Goggle', sector: 'Tech', price: 98.40, volatility: 0.14, description: "Search engine and ad monopoly.", history: [98.40] },
+  { symbol: 'BETA', name: 'Beta', sector: 'Social', price: 112.20, volatility: 0.22, description: "Social media data harvesting giant.", history: [112.20] },
+  { symbol: 'GRFX', name: 'Green Card', sector: 'Tech', price: 450.00, volatility: 0.30, description: "High-performance GPU and AI chip manufacturer.", history: [450.00] },
+  { symbol: 'COIN', name: 'Bitcon Trust', sector: 'Crypto', price: 15.00, volatility: 0.60, description: "Volatile cryptocurrency fund.", history: [15.00] },
+  { symbol: 'SACKS', name: 'Oldman Sacks', sector: 'Finance', price: 320.00, volatility: 0.10, description: "Elite investment banking firm.", history: [320.00] },
+  { symbol: 'GCB', name: 'Grand Central Bank', sector: 'Finance', price: 45.60, volatility: 0.08, description: "Consumer and commercial banking.", history: [45.60] },
+  { symbol: 'FDR', name: 'Franklin D. Reserve', sector: 'Finance', price: 100.00, volatility: 0.02, description: "Federal banking institution.", history: [100.00] },
+  { symbol: 'BADY', name: 'Badyear Blimps', sector: 'Auto', price: 22.40, volatility: 0.15, description: "Tire and rubber manufacturer.", history: [22.40] },
+  { symbol: 'WACK', name: 'WackDonald\'s', sector: 'Food', price: 85.00, volatility: 0.06, description: "Global burger fast food chain.", history: [85.00] },
+  { symbol: 'BUX', name: 'Starblocks', sector: 'Food', price: 55.20, volatility: 0.09, description: "Ubiquitous coffee shop chain.", history: [55.20] },
+  { symbol: 'MART', name: 'Sprawl-Mart', sector: 'Retail', price: 130.00, volatility: 0.05, description: "Big box discount retailer.", history: [130.00] },
+  { symbol: 'SWSH', name: 'Swoosh', sector: 'Apparel', price: 92.00, volatility: 0.11, description: "Athletic wear and sneaker brand.", history: [92.00] },
+  { symbol: 'ELXR', name: 'Snake Oil Pharm', sector: 'Pharma', price: 44.00, volatility: 0.18, description: "Experimental drug manufacturer.", history: [44.00] },
+  { symbol: 'BAND', name: 'Ouchies', sector: 'Health', price: 13.50, volatility: 0.05, description: "Consumer first-aid products.", history: [13.50] },
+  { symbol: 'BONG', name: 'Boink Aero', sector: 'Defense', price: 180.00, volatility: 0.15, description: "Airplane manufacturer and defense contractor.", history: [180.00] },
+  { symbol: 'EDSN', name: 'Edison Motors', sector: 'Auto', price: 199.99, volatility: 0.35, description: "Electric vehicle and battery company.", history: [199.99] },
+  { symbol: 'SPY', name: 'Big Brother Corp', sector: 'Data', price: 18.00, volatility: 0.25, description: "Data analytics and government surveillance.", history: [18.00] },
+  { symbol: 'TWRK', name: 'WeTwerk', sector: 'Real Estate', price: 2.50, volatility: 0.45, description: "Coworking space real estate startup.", history: [2.50] },
+];
+
+// --- 🧠 AI & LOGIC HELPERS ---
+
+const getMarketSentiment = (year, week) => {
+  if (year === 2008 || (year === 2009 && week < 12)) return -0.01;
+  if (year === 2009 && week >= 12) return 0.015;
+  if (year >= 2010 && year <= 2012) return 0.002;
+  if (year >= 2013 && year <= 2019) return 0.005;
+  if (year === 2020) return 0.00;
+  if (year === 2021) return 0.008;
+  if (year === 2022) return -0.005;
+  if (year >= 2023) return 0.006;
+  return 0.001; 
+};
+
+const getMockHeadlines = (count) => {
+  const mocks = [
+    { headline: "Rat seen eating slice of pizza in server room.", stockSymbol: "RAT", signal: "UP", percentage: 0.124, severity: "MED" },
+    { headline: "Jay St Petrotech accidentally drills into subway tunnel.", stockSymbol: "JSP", signal: "DOWN", percentage: 0.087, severity: "MED" },
+    { headline: "Orange releases phone with no screen.", stockSymbol: "ORNG", signal: "DOWN", percentage: 0.153, severity: "HIGH" },
+    { headline: "Edison Motors CEO tweets something weird again.", stockSymbol: "EDSN", signal: "DOWN", percentage: 0.052, severity: "LOW" },
+    { headline: "Empty-A Logistics actually on time for once.", stockSymbol: "EMPTY", signal: "UP", percentage: 0.201, severity: "HIGH" }
+  ];
+  return mocks.slice(0, count);
+};
+
+const generateMilestoneMessage = async (amount) => {
+    const apiKey = "";
+    const prompt = `
+      Write a short, serious, and impactful milestone congratulation message for a stock trading game.
+      The player has just reached a net worth of $${amount.toLocaleString()}.
+      Context: The player started broke ($10k) in 2008 and is fighting their way up.
+      Tone: Serious, reflective, slightly dramatic. NOT funny. NO emojis.
+      Max 25 words.
+      Example for 100k: "Six figures. A dream for many, a reality for you. The first step towards true freedom is complete."
+    `;
+    
+    try {
+        const response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`,
+            {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+            }
+        );
+        const data = await response.json();
+        return data.candidates?.[0]?.content?.parts?.[0]?.text.trim() || "Milestone achieved.";
+    } catch (e) {
+        return "You have reached a significant financial milestone.";
+    }
+};
+
+const generateStartupPitch = async (netWorth, currentYear) => {
+  const apiKey = "";
+  const baseAsk = Math.max(1000, Math.floor((netWorth * (0.05 + Math.random() * 0.15)) / 1000) * 1000);
+  
+  const prompt = `
+    Generate a fictional startup pitch for a stock trading game set in ${currentYear}.
+    Context: A random entrepreneur is messaging the player.
+    
+    Requirements:
+    1. Founder Name (First + Last).
+    2. Company Name (Funny, satirical, or cool).
+    3. Pitch: 2 short sentences. Ideas MUST be appropriate for the year ${currentYear} or slightly ahead (e.g. up to ${currentYear + 2}). DO NOT reference technology that didn't exist yet (e.g. No Web3/GenAI in 2008).
+    4. Equity: A number between 5 and 49 (multiple of 5).
+    5. Success Chance: A number between 1 and 99 (integer). Based on how good you think the idea is.
+    
+    Output JSON ONLY:
+    {
+      "founder": "Name",
+      "company": "Company Name",
+      "pitch": "The pitch text.",
+      "equity": 20,
+      "successChance": 75
+    }
+  `;
+
+  try {
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+      }
+    );
+    const data = await response.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    const cleanJson = text.replace(/```json/g, '').replace(/```/g, '').trim();
+    const result = JSON.parse(cleanJson);
+    
+    return {
+        ...result,
+        ask: baseAsk 
+    };
+  } catch (e) {
+    return {
+        founder: "Elon M.",
+        company: "X-2",
+        pitch: "It's like Twitter but for dogs. We're going to the moon.",
+        equity: 10,
+        successChance: 15,
+        ask: baseAsk
+    };
+  }
+};
+
+const generateBoardQuestion = async (stock) => {
+  const apiKey = "";
+  const prompt = `
+    Generate a corporate board vote scenario.
+    Company: ${stock.name} (${stock.symbol}) - ${stock.sector}
+    Description: ${stock.description}
+    
+    Scenario: The player owns 10,000 shares and is invited to the board. The CFO needs a tie-breaking vote on a controversial strategy.
+    
+    Output JSON ONLY:
+    {
+      "cfoName": "CFO Name",
+      "question": "The question text...",
+      "yesText": "Vote YES",
+      "noText": "Vote NO",
+      "yesImpact": 0.10,
+      "noImpact": -0.05,
+      "yesOutcome": "Outcome message if Yes...",
+      "noOutcome": "Outcome message if No..."
+    }
+  `;
+
+  try {
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+      }
+    );
+    const data = await response.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    const cleanJson = text.replace(/```json/g, '').replace(/```/g, '').trim();
+    return JSON.parse(cleanJson);
+  } catch (e) {
+    return {
+        cfoName: "CFO Default",
+        question: "Should we try to make more money?",
+        yesText: "Yes",
+        noText: "No",
+        yesImpact: 0.05,
+        noImpact: -0.02,
+        yesOutcome: "We made money.",
+        noOutcome: "We stayed safe."
+    };
+  }
+};
+
+const generateRelativeRequest = async (currentYear) => {
+  const apiKey = "";
+  const prompt = `
+    Generate a text message from a needy relative asking for money.
+    Context: Stock trading game, year ${currentYear}.
+    
+    Requirements:
+    1. Relation: e.g. "Cousin Greg", "Aunt May", "Step-bro Chad", "Uncle Rico".
+    2. Message: Short, informal, slightly desperate or manipulative text asking for money for a specific funny reason (e.g. "parking tickets", "dinner date", "lost bet", "new business idea", "bail"). Max 2 sentences.
+    3. Amount: Integer between 100 and 800.
+    
+    Output JSON ONLY:
+    {
+      "relation": "Cousin Greg",
+      "message": "Yo cuz, I'm in a bind...",
+      "amount": 350
+    }
+  `;
+
+  try {
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+      }
+    );
+    const data = await response.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    const cleanJson = text.replace(/```json/g, '').replace(/```/g, '').trim();
+    const result = JSON.parse(cleanJson);
+    return result;
+  } catch (e) {
+    return {
+        relation: "Cousin Vinny",
+        message: "Hey buddy, need a small loan for... pizza.",
+        amount: 200
+    };
+  }
+};
+
+const generatePersonaMessage = async (persona, context) => {
+  const apiKey = "";
+  const prompt = `
+    You are writing a short, text-message/pager style message.
+    Sender Persona: ${persona}
+    Context: ${context}
+    Requirements: Max 25 words. Informal, gritty. No hashtags. Return ONLY the message text.
+  `;
+  try {
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`,
+      { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }) }
+    );
+    const data = await response.json();
+    return data.candidates?.[0]?.content?.parts?.[0]?.text.trim() || "Msg Corrupted.";
+  } catch (e) { return "Error receiving transmission."; }
+};
+
+const generateInsiderTip = async (stocks) => {
+  const apiKey = "";
+  
+  // Pick random stock and random direction
+  const stock = stocks[Math.floor(Math.random() * stocks.length)];
+  const isUp = Math.random() > 0.5;
+  const direction = isUp ? "UP" : "DOWN";
+  const directionText = isUp ? "skyrocket" : "crash";
+  
+  const prompt = `
+    Generate a cryptic insider trading tip.
+    Sender: Unknown Insider.
+    Stock: ${stock.name} (${stock.symbol}).
+    Prediction: It will ${directionText}.
+    
+    Requirements: 
+    - Max 20 words.
+    - Sound shady, like a rumor or leak.
+    - Example: "Heard whispers about [STOCK] failing an audit. Dump it."
+    - Return ONLY the message text.
+  `;
+
+  try {
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`,
+      { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }) }
+    );
+    const data = await response.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text.trim();
+    
+    return {
+       text,
+       symbol: stock.symbol,
+       isUp: isUp,
+       // The tip might be a lie, but this is the content of the tip
+       impact: isUp ? 0.15 : -0.15
+    };
+  } catch (e) {
+    return {
+       text: `Rumor has it ${stock.symbol} is about to make a move. Watch closely.`,
+       symbol: stock.symbol,
+       isUp: isUp,
+       impact: isUp ? 0.15 : -0.15
+    };
+  }
+};
+
+const fetchGeminiNews = async (stocks, portfolio, count, currentYear, excludedSymbols = []) => {
+  const apiKey = ""; 
+  if (count === 0) return [];
+  try {
+    const availableStocks = stocks.filter(s => !excludedSymbols.includes(s.symbol));
+    const holdingsKeys = Object.keys(portfolio).filter(k => portfolio[k]?.shares > 0);
+    const chosenStocks = [];
+    if (holdingsKeys.length > 0) {
+      const validHoldings = holdingsKeys.filter(k => !excludedSymbols.includes(k));
+      if (validHoldings.length > 0) {
+        const heldSymbol = validHoldings[Math.floor(Math.random() * validHoldings.length)];
+        const heldStock = stocks.find(s => s.symbol === heldSymbol);
+        if (heldStock) chosenStocks.push(heldStock);
+      }
+    }
+    while (chosenStocks.length < count) {
+      if (availableStocks.length === 0) break;
+      const randomStock = availableStocks[Math.floor(Math.random() * availableStocks.length)];
+      if (randomStock && !chosenStocks.find(s => s.symbol === randomStock.symbol)) {
+        chosenStocks.push(randomStock);
+      }
+    }
+    const prompt = `
+      Generate ${count} funny, satirical financial news headlines.
+      Context: A stock trading game set in ${currentYear}.
+      
+      Requirements:
+      - News must be historically plausible for ${currentYear}. (e.g. No AI chips/Crypto/TikTok in 2008).
+      - Do NOT reference New York City or Brooklyn specifically unless relevant to a specific local stock (like JSP). Keep it general/national/global.
+      
+      For these companies (Use description to understand company type):
+      ${chosenStocks.map(s => `- ${s.symbol}: ${s.name} (${s.sector}) - ${s.description}`).join('\n')}
+      RETURN JSON ARRAY ONLY. Format: [{ "headline": "Text", "stockSymbol": "TICKER", "signal": "UP/DOWN", "percentage": float (0.01-0.30), "severity": "LOW/MED/HIGH" }]
+    `;
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`,
+      { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }) }
+    );
+    const data = await response.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    const cleanJson = text.replace(/```json/g, '').replace(/```/g, '').trim();
+    let parsedNews = JSON.parse(cleanJson);
+    parsedNews = parsedNews.map(item => ({ ...item, percentage: item.percentage + (Math.random() * 0.009) }));
+    return parsedNews;
+  } catch (error) { return []; }
+};
+
+// --- EXTRACTED MODALS (Moved outside App to prevent focus loss) ---
+
+const AchievementsModal = ({ isOpen, onClose }) => {
+    if (!isOpen) return null;
+
+    return (
+        <div className="absolute inset-0 bg-black/95 flex items-center justify-center z-[95] backdrop-blur-md" onClick={onClose}>
+            <div className="bg-[#0f1623] border-2 border-yellow-600 max-w-4xl w-full h-[80vh] font-mono shadow-[0_0_80px_rgba(234,179,8,0.15)] flex flex-col animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+                <div className="flex justify-between items-center border-b-2 border-yellow-600/50 p-6 bg-yellow-900/10">
+                    <h2 className="text-2xl font-bold text-yellow-500 flex items-center gap-3">
+                        <Trophy size={28} /> HALL OF FAME
+                    </h2>
+                    <button onClick={onClose} className="text-yellow-500/50 hover:text-yellow-400 transition-colors">
+                        <X size={24} />
+                    </button>
+                </div>
+                
+                <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {ACHIEVEMENTS_LIST.map((ach, index) => (
+                            <div key={index} className="bg-black/40 border border-yellow-900/30 p-4 rounded hover:border-yellow-600/50 transition-colors group">
+                                <div className="flex items-start gap-3">
+                                    <div className="bg-yellow-900/20 p-2 rounded-full group-hover:bg-yellow-600/20 transition-colors">
+                                        <Trophy size={16} className="text-yellow-700 group-hover:text-yellow-400" />
+                                    </div>
+                                    <div>
+                                        <div className="text-yellow-100 font-bold text-sm mb-1">{ach.title}</div>
+                                        <div className="text-gray-500 text-xs leading-snug">{ach.desc}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="p-4 border-t border-yellow-600/30 text-center text-xs text-yellow-700 uppercase tracking-widest bg-black/40">
+                    Gotta Collect 'Em All
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const TradeModal = ({ stock, setStock, quantity, setQuantity, balance, onBuy }) => {
+    if (!stock) return null;
+    
+    // Safety handling for empty string state
+    const qtyVal = quantity === '' ? 0 : quantity;
+    const cost = stock.price * qtyVal;
+    const canAfford = balance >= cost && qtyVal > 0;
+
+    return (
+      <div className="absolute inset-0 bg-black/90 flex items-center justify-center z-[80] backdrop-blur-sm" onClick={() => setStock(null)}>
+         <div className="bg-[#0f1623] border-2 border-green-500 p-6 w-96 shadow-[0_0_50px_rgba(0,255,0,0.3)] animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-start border-b border-green-800 pb-4 mb-4">
+               <div>
+                  <h3 className="text-2xl font-bold text-white">{stock.symbol}</h3>
+                  <div className="text-green-500 text-xs">{stock.name}</div>
+                  <div className="text-gray-500 text-[10px] mt-1 uppercase">{SECTOR_MAP[stock.sector] || stock.sector}</div>
+               </div>
+               <div className="text-right">
+                  <div className="text-xl text-white font-mono">${stock.price.toFixed(2)}</div>
+                  <div className="text-xs text-gray-400">PER SHARE</div>
+               </div>
+            </div>
+
+            <div className="space-y-4">
+               <div className="flex items-center justify-between">
+                  <span className="text-green-400 text-sm">QUANTITY:</span>
+                  <input 
+                    type="number" 
+                    min="1"
+                    value={quantity} 
+                    onChange={(e) => {
+                        const val = e.target.value;
+                        if (val === '') {
+                            setQuantity('');
+                        } else {
+                            const num = parseInt(val);
+                            if (!isNaN(num) && num >= 0) setQuantity(num);
+                        }
+                    }}
+                    className="bg-black border border-green-700 text-white p-2 w-24 text-right font-mono focus:outline-none focus:border-green-400"
+                  />
+               </div>
+
+               <div className="border-t border-green-900/50 pt-4 mt-4">
+                  <div className="flex justify-between text-sm mb-2">
+                     <span className="text-gray-400">TOTAL COST:</span>
+                     <span className="text-white font-mono">${cost.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-xs mb-4">
+                     <span className="text-gray-500">CASH AVAILABLE:</span>
+                     <span className={`${canAfford ? 'text-green-600' : 'text-red-500'} font-mono`}>${balance.toFixed(2)}</span>
+                  </div>
+               </div>
+
+               <button 
+                  disabled={!canAfford}
+                  onClick={() => onBuy(stock.symbol, stock.price, qtyVal)}
+                  className={`w-full py-3 font-bold text-lg tracking-widest transition-all ${canAfford ? 'bg-green-600 hover:bg-green-500 text-black' : 'bg-gray-800 text-gray-500 cursor-not-allowed'}`}
+               >
+                  {canAfford ? 'CONFIRM ORDER' : 'INSUFFICIENT FUNDS'}
+               </button>
+               
+               <button 
+                  onClick={() => setStock(null)}
+                  className="w-full py-2 text-xs text-green-700 hover:text-green-400"
+               >
+                  CANCEL
+               </button>
+            </div>
+         </div>
+      </div>
+    );
+};
+
+const SellModal = ({ stock, setStock, quantity, setQuantity, portfolio, onSell }) => {
+    if (!stock) return null;
+    
+    // Check current holdings
+    const holding = portfolio[stock.symbol];
+    const maxShares = holding ? holding.shares : 0;
+    
+    // Safety handling for empty string state
+    const qtyVal = quantity === '' ? 0 : quantity;
+    const revenue = stock.price * qtyVal;
+    const isValid = qtyVal > 0 && qtyVal <= maxShares;
+
+    return (
+      <div className="absolute inset-0 bg-black/90 flex items-center justify-center z-[80] backdrop-blur-sm" onClick={() => setStock(null)}>
+         <div className="bg-[#0f1623] border-2 border-red-500 p-6 w-96 shadow-[0_0_50px_rgba(255,0,0,0.3)] animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-start border-b border-red-900 pb-4 mb-4">
+               <div>
+                  <h3 className="text-2xl font-bold text-white">{stock.symbol}</h3>
+                  <div className="text-red-500 text-xs">{stock.name}</div>
+                  <div className="text-gray-500 text-[10px] mt-1 uppercase">{SECTOR_MAP[stock.sector] || stock.sector}</div>
+               </div>
+               <div className="text-right">
+                  <div className="text-xl text-white font-mono">${stock.price.toFixed(2)}</div>
+                  <div className="text-xs text-gray-400">PER SHARE</div>
+               </div>
+            </div>
+
+            <div className="space-y-4">
+               <div className="flex items-center justify-between">
+                  <span className="text-red-400 text-sm">QUANTITY (Max: {maxShares}):</span>
+                  <input 
+                    type="number" 
+                    min="1"
+                    max={maxShares}
+                    value={quantity} 
+                    onChange={(e) => {
+                        const val = e.target.value;
+                        if (val === '') {
+                            setQuantity('');
+                        } else {
+                            const num = parseInt(val);
+                            if (!isNaN(num) && num >= 0) setQuantity(num);
+                        }
+                    }}
+                    className="bg-black border border-red-700 text-white p-2 w-24 text-right font-mono focus:outline-none focus:border-red-400"
+                  />
+               </div>
+
+               <div className="border-t border-red-900/50 pt-4 mt-4">
+                  <div className="flex justify-between text-sm mb-2">
+                     <span className="text-gray-400">EST. REVENUE:</span>
+                     <span className="text-white font-mono">${revenue.toFixed(2)}</span>
+                  </div>
+               </div>
+
+               <button 
+                  disabled={!isValid}
+                  onClick={() => onSell(stock.symbol, stock.price, qtyVal)}
+                  className={`w-full py-3 font-bold text-lg tracking-widest transition-all ${isValid ? 'bg-red-600 hover:bg-red-500 text-white' : 'bg-gray-800 text-gray-500 cursor-not-allowed'}`}
+               >
+                  CONFIRM SALE
+               </button>
+               
+               <button 
+                  onClick={() => setStock(null)}
+                  className="w-full py-2 text-xs text-red-700 hover:text-red-400"
+               >
+                  CANCEL
+               </button>
+            </div>
+         </div>
+      </div>
+    );
+};
+
+const CheatModal = ({ isOpen, onClose, gameTime, onTravel }) => {
+    if (!isOpen) return null;
+    const [targetYear, setTargetYear] = useState(gameTime.year);
+    const [targetWeek, setTargetWeek] = useState(gameTime.week);
+
+    const handleTravel = () => {
+      onTravel({ year: parseInt(targetYear), week: parseInt(targetWeek) });
+      onClose();
+    };
+
+    return (
+      <div className="absolute inset-0 bg-black/90 flex items-center justify-center z-[100] backdrop-blur-md">
+         <div className="bg-[#0f1623] border-2 border-purple-500 p-6 w-80 shadow-[0_0_50px_rgba(168,85,247,0.3)] animate-in zoom-in-95 font-mono">
+            <h2 className="text-xl text-purple-500 font-bold mb-4">DEV_TIMETRAVEL</h2>
+            <div className="space-y-4">
+               <div>
+                    <label className="block text-gray-400 text-xs mb-1">YEAR</label>
+                    <input 
+                        type="number" 
+                        value={targetYear} 
+                        onChange={e => setTargetYear(e.target.value)} 
+                        className="w-full bg-black border border-gray-700 text-white p-2"
+                    />
+                </div>
+               <div>
+                    <label className="block text-gray-400 text-xs mb-1">WEEK (1-52)</label>
+                    <input 
+                        type="number" 
+                        value={targetWeek} 
+                        onChange={e => setTargetWeek(e.target.value)} 
+                        className="w-full bg-black border border-gray-700 text-white p-2"
+                    />
+                </div>
+               <button onClick={handleTravel} className="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-2">WARP</button>
+               <button onClick={onClose} className="w-full text-gray-500 hover:text-white text-xs py-2">CANCEL</button>
+            </div>
+         </div>
+      </div>
+    );
+};
+
+const NewsModal = ({ isOpen, onClose, newsFeed, gameTime }) => {
+    if (!isOpen || newsFeed.length === 0) return null;
+    return (
+       <div className="absolute inset-0 bg-black/90 flex items-center justify-center z-50 backdrop-blur-sm" onClick={onClose}>
+          <div className="bg-[#0f1623] border-2 border-green-500 p-6 max-w-lg w-full shadow-[0_0_50px_rgba(0,255,0,0.2)] animate-in fade-in zoom-in duration-300" onClick={e => e.stopPropagation()}>
+             <div className="flex justify-between items-start mb-4 border-b border-green-800 pb-2">
+                <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                   <AlertCircle className="text-yellow-400 animate-pulse" /> MARKET NEWS
+                </h3>
+                <span className="text-xs text-green-600">WK {gameTime.week}</span>
+             </div>
+             
+             <div className="space-y-4 max-h-[60vh] overflow-y-auto custom-scrollbar">
+               {newsFeed.map((item, idx) => (
+                 <div key={idx} className="border-b border-green-900/50 pb-3 last:border-0">
+                    <div className="flex justify-between items-start">
+                       <span className="text-green-400 font-bold text-xs bg-green-900/30 px-1 rounded mb-1 inline-block">{item.stockSymbol}</span>
+                       <span className={`text-[10px] font-bold px-1 rounded ${item.signal === 'UP' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                          {item.signal === 'UP' ? '▲' : '▼'} {(item.percentage * 100).toFixed(1)}%
+                       </span>
+                    </div>
+                    <p className="text-sm text-green-100 font-serif tracking-wide leading-relaxed">
+                        "{item.headline}"
+                    </p>
+                 </div>
+               ))}
+             </div>
+
+             <div className="mt-6 flex justify-center">
+                <button onClick={onClose} className="text-green-400 hover:text-white underline text-xs">DISMISS [SPACE]</button>
+             </div>
+          </div>
+       </div>
+    );
+};
+
+const MessageModal = ({ isOpen, onClose, queue, setQueue }) => {
+    if (!isOpen || queue.length === 0) return null;
+    const msg = queue[0];
+
+    const dismiss = (e) => {
+        if (e) e.stopPropagation();
+        const newQueue = queue.slice(1);
+        setQueue(newQueue);
+        if (newQueue.length === 0) onClose();
+    };
+
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (isOpen && e.code === 'Space') {
+                e.preventDefault();
+                dismiss(e);
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [isOpen, queue, onClose]);
+
+    return (
+       <div className="absolute inset-0 bg-black/80 flex items-center justify-center z-[70] backdrop-blur-sm" onClick={dismiss}>
+          <div className="bg-gray-200 border-4 border-gray-400 p-1 w-80 shadow-2xl rounded-sm font-sans animate-in slide-in-from-bottom-10 duration-300" onClick={dismiss}>
+             <div className="bg-[#4a5d4e] p-4 text-[#c7dcc9] font-mono text-sm shadow-inner min-h-[150px] flex flex-col justify-between relative overflow-hidden">
+                <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.1)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] z-10 bg-[length:100%_2px,3px_100%] opacity-20"></div>
+                
+                <div>
+                    <div className="border-b border-[#c7dcc9]/30 pb-1 mb-2 flex justify-between items-center text-[10px]">
+                        <span>FROM: {msg.sender.toUpperCase()}</span>
+                        <span>[NEW MSG]</span>
+                    </div>
+                    <p className="leading-tight">{msg.text}</p>
+                </div>
+                
+                <div className="text-center mt-4 text-[10px] animate-pulse">
+                    PRESS [SPACE] OR CLICK TO CLOSE
+                </div>
+             </div>
+          </div>
+       </div>
+    );
+};
+
+const RentModal = ({ isOpen, onClose, pendingRent, onPay }) => {
+    if (!isOpen || !pendingRent) return null;
+
+    return (
+       <div className="absolute inset-0 bg-black/80 flex items-center justify-center z-[75] backdrop-blur-sm" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-gray-200 border-4 border-red-800 p-1 w-80 shadow-2xl rounded-sm font-sans animate-in slide-in-from-bottom-10 duration-300">
+             <div className="bg-[#5d4a4a] p-4 text-[#dcc7c7] font-mono text-sm shadow-inner min-h-[180px] flex flex-col justify-between relative overflow-hidden">
+                <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.1)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,0,0,0.02),rgba(255,0,0,0.06))] z-10 bg-[length:100%_2px,3px_100%] opacity-20"></div>
+                
+                <div>
+                    <div className="border-b border-[#dcc7c7]/30 pb-1 mb-2 flex justify-between items-center text-[10px]">
+                        <span className="font-bold">FROM: UNCLE JACOB</span>
+                        <span className="bg-red-900/50 px-1 rounded animate-pulse">[URGENT]</span>
+                    </div>
+                    <p className="leading-tight my-2">{pendingRent.message}</p>
+                </div>
+                
+                <button 
+                  onClick={onPay}
+                  className="mt-4 bg-[#dcc7c7] text-[#5d4a4a] font-bold py-2 hover:bg-white transition-colors border-b-4 border-[#8c7777] active:border-b-0 active:translate-y-1 flex items-center justify-center gap-2 w-full"
+                >
+                   <Wallet size={14} /> PAY RENT (-${pendingRent.amount})
+                </button>
+             </div>
+          </div>
+       </div>
+    );
+};
+
+const RelativeModal = ({ isOpen, onClose, pendingRelative, balance, onPay, onBlock }) => {
+    if (!isOpen || !pendingRelative) return null;
+    const canAfford = balance >= pendingRelative.amount;
+
+    return (
+       <div className="absolute inset-0 bg-black/80 flex items-center justify-center z-[78] backdrop-blur-sm" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-gray-200 border-4 border-yellow-700 p-1 w-80 shadow-2xl rounded-sm font-sans animate-in slide-in-from-bottom-10 duration-300">
+             {/* RETRO PAGER / PHONE STYLE - RELATIVE EDITION */}
+             <div className="bg-[#5d5a4a] p-4 text-[#dcdcc7] font-mono text-sm shadow-inner min-h-[180px] flex flex-col justify-between relative overflow-hidden">
+                {/* Scanlines */}
+                <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.1)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,0,0,0.02),rgba(255,0,0,0.06))] z-10 bg-[length:100%_2px,3px_100%] opacity-20"></div>
+                
+                <div>
+                    <div className="border-b border-[#dcdcc7]/30 pb-1 mb-2 flex justify-between items-center text-[10px]">
+                        <span className="font-bold">FROM: {pendingRelative.relation.toUpperCase()}</span>
+                        <span className="bg-yellow-900/50 px-1 rounded animate-pulse">[FAMILY]</span>
+                    </div>
+                    <p className="leading-tight my-2 italic">"{pendingRelative.message}"</p>
+                    <div className="text-center font-bold mt-2 text-yellow-200">Asking: ${pendingRelative.amount}</div>
+                </div>
+                
+                <div className="mt-4 space-y-2">
+                    <button 
+                      disabled={!canAfford}
+                      onClick={onPay}
+                      className={`w-full font-bold py-2 transition-colors border-b-4 active:border-b-0 active:translate-y-1 flex items-center justify-center gap-2 text-xs ${canAfford ? 'bg-[#c7dcc9] text-[#4a5d4e] border-[#778c77] hover:bg-white' : 'bg-gray-500 text-gray-300 border-gray-600 cursor-not-allowed'}`}
+                    >
+                       <UserCheck size={14} /> GIVE MONEY (-${pendingRelative.amount})
+                    </button>
+
+                    <button 
+                      onClick={onBlock}
+                      className="w-full bg-[#dcc7c7] text-[#5d4a4a] font-bold py-2 hover:bg-white transition-colors border-b-4 border-[#8c7777] active:border-b-0 active:translate-y-1 flex items-center justify-center gap-2 text-xs"
+                    >
+                       <UserMinus size={14} /> BLOCK THEM
+                    </button>
+                </div>
+             </div>
+          </div>
+       </div>
+    );
+};
+
+const BoardModal = ({ isOpen, pendingBoardIssue, onVote }) => {
+    if (!isOpen || !pendingBoardIssue) return null;
+
+    return (
+        <div className="absolute inset-0 bg-black/90 flex items-center justify-center z-[88] backdrop-blur-md" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-slate-200 border-4 border-slate-600 p-1 w-96 shadow-2xl rounded-sm font-sans animate-in zoom-in-95 duration-200">
+                <div className="bg-slate-50 p-4 text-slate-900 shadow-inner min-h-[250px] flex flex-col relative overflow-hidden">
+                    <div className="flex justify-between items-center border-b-2 border-slate-300 pb-2 mb-2">
+                        <div className="flex items-center gap-2">
+                            <div className="bg-slate-800 text-white p-1 rounded">
+                                <Gavel size={16} />
+                            </div>
+                            <div className="flex flex-col leading-none">
+                                <span className="font-bold text-sm">BOARD MEETING</span>
+                                <span className="text-[10px] text-slate-500 uppercase tracking-wider">{pendingBoardIssue.symbol}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="flex-1 space-y-4 text-sm">
+                        <div className="bg-slate-100 p-3 rounded border border-slate-300 italic text-slate-700">
+                            <div className="font-bold text-xs text-slate-900 mb-1">{pendingBoardIssue.cfoName} (CFO) says:</div>
+                            "{pendingBoardIssue.message}"
+                        </div>
+                        
+                        <div className="font-bold text-lg text-center text-slate-900 leading-tight">
+                            {pendingBoardIssue.question}
+                        </div>
+                    </div>
+
+                    <div className="mt-6 grid grid-cols-2 gap-3">
+                        <button 
+                            onClick={() => onVote(true)}
+                            className="py-3 bg-green-700 hover:bg-green-600 text-white font-bold rounded shadow-md border-b-4 border-green-900 active:border-b-0 active:translate-y-1 transition-all"
+                        >
+                            {pendingBoardIssue.yesText || "VOTE YES"}
+                        </button>
+                        <button 
+                            onClick={() => onVote(false)}
+                            className="py-3 bg-red-700 hover:bg-red-600 text-white font-bold rounded shadow-md border-b-4 border-red-900 active:border-b-0 active:translate-y-1 transition-all"
+                        >
+                            {pendingBoardIssue.noText || "VOTE NO"}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const MonthRecapModal = ({ isOpen, onClose, data, pendingRent, pendingRelative, pendingBoardIssue, messageQueue, setShowRentModal, setShowRelativeModal, setShowBoardModal, setShowMessageModal, stocks }) => {
+    if (!isOpen || !data) return null;
+    
+    const { news, startWeek, endWeek, year, startWorth, endWorth } = data;
+    const diff = endWorth - startWorth;
+    const diffPercent = startWorth !== 0 ? ((diff / startWorth) * 100).toFixed(1) : "0.0";
+    const isGain = diff > 0;
+    const isNeutral = diffPercent === "0.0";
+
+    const close = () => {
+        onClose();
+        // Priority Queue for interruptions
+        if (pendingRent) {
+            setShowRentModal(true);
+        } else if (pendingBoardIssue) {
+            setShowBoardModal(true);
+        } else if (pendingRelative) {
+            setShowRelativeModal(true);
+        } else if (messageQueue.length > 0) {
+            setShowMessageModal(true);
+        }
+    };
+
+    return (
+       <div className="absolute inset-0 bg-black/95 flex items-center justify-center z-[60] backdrop-blur-md" onClick={close}>
+          <div className="bg-[#0a0e1a] border-2 border-green-500 max-w-lg w-full font-mono shadow-[0_0_80px_rgba(0,255,0,0.1)] p-1 animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+             <div className="text-green-500 text-xs leading-none whitespace-pre-wrap select-none mb-4">
+{`┌─────────────────────────────────────────────┐
+│  📅 MONTH RECAP - WEEKS ${startWeek}-${endWeek}, ${year}        │
+├─────────────────────────────────────────────┤`}
+             </div>
+
+             <div className="px-6 space-y-6">
+                <div>
+                   <div className="text-green-300 font-bold mb-3 border-b border-green-800 pb-1">📰 NEWS THIS MONTH:</div>
+                   <div className="space-y-4 text-xs">
+                      {news.length === 0 ? <div className="text-gray-500 italic">No major headlines this month...</div> : 
+                        news.map((item, i) => (
+                           <div key={i} className="pl-2 border-l-2 border-green-900">
+                              <div className="text-green-600 mb-0.5">Week {item.week}: {item.headline}</div>
+                              <div className={`${item.signal === 'UP' ? 'text-green-400' : 'text-red-400'} font-bold`}>
+                                 → {stocks.find(s => s.symbol === item.stockSymbol)?.name || item.stockSymbol} {item.signal === 'UP' ? '+' : '-'}{(item.percentage * 100).toFixed(1)}%
+                              </div>
+                           </div>
+                        ))
+                      }
+                   </div>
+                </div>
+
+                <div>
+                   <div className="text-green-300 font-bold mb-3 border-b border-green-800 pb-1">💰 YOUR PORTFOLIO:</div>
+                   <div className="bg-green-900/10 p-3 rounded border border-green-900/30 text-center">
+                      <div className="text-gray-400 text-xs mb-1">NET WORTH CHANGE</div>
+                      <div className="flex items-center justify-center gap-2 text-lg">
+                          <span className="text-gray-400">${Math.floor(startWorth).toLocaleString()}</span>
+                          <span className="text-green-600">→</span>
+                          <span className="text-white font-bold">${Math.floor(endWorth).toLocaleString()}</span>
+                      </div>
+                      
+                      <div className={`text-sm font-bold mt-1 ${isNeutral ? 'text-yellow-400' : isGain ? 'text-green-400' : 'text-red-400'}`}>
+                         {isGain && !isNeutral ? '+' : ''}{diffPercent}% {isNeutral ? '(BOOOring)' : isGain ? '(STONKS!)' : '(OUCH)'}
+                      </div>
+                   </div>
+                </div>
+
+                <div className="text-center pt-2 pb-4">
+                   <button onClick={close} className="text-green-400 hover:text-white hover:bg-green-900/50 px-4 py-1 rounded transition-colors text-sm border border-transparent hover:border-green-500">
+                      [ CONTINUE ]
+                   </button>
+                </div>
+             </div>
+
+             <div className="text-green-500 text-xs leading-none whitespace-pre-wrap select-none mt-2">
+{`└─────────────────────────────────────────────┘`}
+             </div>
+          </div>
+       </div>
+    );
+};
+
+const StartupModal = ({ isOpen, onClose, pendingStartup, balance, onInvest, onViewPortfolio }) => {
+    if (!isOpen || !pendingStartup) return null;
+    const canAfford = balance >= pendingStartup.ask;
+
+    return (
+        <div className="absolute inset-0 bg-black/90 flex items-center justify-center z-[85] backdrop-blur-md" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-gray-100 border-4 border-blue-600 p-1 w-96 shadow-2xl rounded-sm font-sans animate-in zoom-in-95 duration-200">
+                <div className="bg-white p-4 text-gray-900 shadow-inner min-h-[250px] flex flex-col relative overflow-hidden">
+                    <div className="flex justify-between items-center border-b-2 border-gray-200 pb-2 mb-2">
+                        <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold">
+                                {pendingStartup.founder.charAt(0)}
+                            </div>
+                            <div className="flex flex-col leading-none">
+                                <span className="font-bold text-sm">{pendingStartup.founder}</span>
+                                <span className="text-[10px] text-gray-500">Entrepreneur</span>
+                            </div>
+                        </div>
+                        <button onClick={onClose} className="text-gray-400 hover:text-red-500"><X size={16}/></button>
+                    </div>
+
+                    <div className="flex-1 space-y-3 text-sm">
+                        <div className="bg-blue-50 p-2 rounded text-blue-900 text-xs italic">
+                            "Hey Steve! Heard you're the guy to talk to about smart money."
+                        </div>
+                        <p className="font-bold text-lg leading-tight">{pendingStartup.company}</p>
+                        <p className="text-gray-700">{pendingStartup.pitch}</p>
+                        
+                        <div className="grid grid-cols-2 gap-2 mt-4">
+                            <div className="bg-gray-100 p-2 rounded text-center border border-gray-300">
+                                <div className="text-[10px] text-gray-500 uppercase">Investment</div>
+                                <div className="font-bold text-lg">${pendingStartup.ask.toLocaleString()}</div>
+                            </div>
+                            <div className="bg-gray-100 p-2 rounded text-center border border-gray-300">
+                                <div className="text-[10px] text-gray-500 uppercase">Equity</div>
+                                <div className="font-bold text-lg">{pendingStartup.equity}%</div>
+                            </div>
+                        </div>
+                        
+                        <div className="flex items-center justify-between text-xs px-1">
+                            <span className="text-gray-500">Est. Success Chance:</span>
+                            <span className={`font-bold ${pendingStartup.successChance > 60 ? 'text-green-600' : pendingStartup.successChance < 40 ? 'text-red-500' : 'text-yellow-600'}`}>
+                                {pendingStartup.successChance}%
+                            </span>
+                        </div>
+                    </div>
+
+                    <div className="mt-4 space-y-2">
+                        <button 
+                            onClick={onInvest}
+                            disabled={!canAfford}
+                            className={`w-full py-2 font-bold text-white rounded transition-colors flex items-center justify-center gap-2 ${canAfford ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'}`}
+                        >
+                            {canAfford ? 'INVEST NOW' : 'INSUFFICIENT FUNDS'}
+                        </button>
+                        
+                        {!canAfford && (
+                            <button 
+                                onClick={onViewPortfolio}
+                                className="w-full py-2 border border-blue-600 text-blue-600 font-bold rounded hover:bg-blue-50 transition-colors text-xs"
+                            >
+                                OPEN PORTFOLIO (SELL STOCKS)
+                            </button>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const IntroModal = ({ isOpen, onClose, onStart }) => {
+    if (!isOpen) return null;
+    return (
+       <div className="absolute inset-0 bg-black/95 flex items-center justify-center z-[100] backdrop-blur-md p-4" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-[#0f1623] border-2 border-green-500 max-w-lg w-full font-mono shadow-[0_0_80px_rgba(0,255,0,0.15)] p-1 animate-in zoom-in-95 duration-300">
+             
+             {/* Header */}
+             <div className="border-b-2 border-green-500 p-4 bg-green-900/10">
+                <h1 className="text-xl font-bold text-white flex items-center gap-2">
+                   <Terminal size={24} className="text-green-500" /> CHARLIE SWAB
+                </h1>
+                <div className="text-green-600 text-xs uppercase tracking-widest mt-1">Totally Legit Stock Exchange (TLSE)</div>
+             </div>
+
+             <div className="p-6 text-green-100 text-sm font-mono leading-relaxed space-y-4">
+                <div className="text-green-500 font-bold border-b border-green-800/50 pb-2 mb-4">
+                   December 26, 2007
+                </div>
+                
+                <p>Merry Christmas, you're fired.</p>
+                
+                <div className="space-y-1">
+                   <p>You are Steve.</p>
+                   <p>Ex-finance bro, now unemployed.</p>
+                   <p>$10,000 in savings.</p>
+                   <p className="text-red-400">Rent due in 3 months.</p>
+                </div>
+
+                <div className="space-y-1 pt-2">
+                   <p>You swore off day trading.</p>
+                   <p>Weekly swings only. Disciplined.</p>
+                   <p>Strategic. Smart.</p>
+                </div>
+
+                <div className="pt-2">
+                   <p>They say the market is going to crash.</p>
+                   <p className="text-green-400">Maybe that's your opportunity.</p>
+                </div>
+
+                <div className="pt-4 text-center text-gray-400 italic">
+                   TLSE is waiting.<br/>
+                   Good luck. You'll need it.
+                </div>
+             </div>
+
+             <div className="p-4 border-t-2 border-green-500 bg-green-900/10">
+                <button 
+                  onClick={() => {
+                    onClose();
+                    onStart();
+                  }}
+                  className="w-full py-3 bg-green-600 hover:bg-green-500 text-black font-bold tracking-widest transition-all uppercase flex items-center justify-center gap-2 group"
+                >
+                  <span className="group-hover:animate-pulse">[ START TRADING ]</span>
+                </button>
+             </div>
+          </div>
+       </div>
+    );
+};
+
+const MilestoneModal = ({ isOpen, onClose, data }) => {
+    if (!isOpen || !data) return null;
+
+    return (
+       <div className="absolute inset-0 bg-black/95 flex items-center justify-center z-[90] backdrop-blur-md" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-[#0f1623] border-2 border-yellow-500 max-w-lg w-full font-mono shadow-[0_0_100px_rgba(234,179,8,0.3)] p-6 animate-in zoom-in-95 duration-500 text-center">
+             <div className="text-yellow-500 mb-4 animate-bounce">
+                <TrendingUp size={48} className="mx-auto" />
+             </div>
+             <h2 className="text-2xl font-bold text-white mb-2 uppercase">Milestone Reached!</h2>
+             <div className="text-4xl font-bold text-yellow-400 mb-6">${data.amount.toLocaleString()} NET WORTH</div>
+             <p className="text-green-100 text-sm mb-6">
+                {data.message}
+             </p>
+             <button 
+               onClick={onClose}
+               className="px-8 py-2 bg-yellow-600 hover:bg-yellow-500 text-black font-bold rounded transition-colors uppercase"
+             >
+               Keep Climbing
+             </button>
+          </div>
+       </div>
+    );
+};
+
+const GameOverModal = ({ isOpen, onRestart }) => {
+    if (!isOpen) return null;
+    return (
+        <div className="absolute inset-0 bg-black flex items-center justify-center z-[100] p-4">
+            <div className="bg-red-950 border-4 border-red-600 max-w-md w-full font-mono shadow-[0_0_100px_rgba(220,38,38,0.5)] p-8 text-center animate-in zoom-in-90 duration-500">
+                <Skull size={64} className="mx-auto text-red-500 mb-4 animate-pulse" />
+                <h1 className="text-4xl font-bold text-red-500 mb-2 tracking-widest">BANKRUPT</h1>
+                <p className="text-red-200 text-lg mb-8">You have lost everything. Steve is now homeless.</p>
+                <button 
+                    onClick={onRestart}
+                    className="w-full py-4 bg-red-700 hover:bg-red-600 text-white font-bold text-xl uppercase tracking-widest transition-colors border border-red-500"
+                >
+                    TRY AGAIN
+                </button>
+            </div>
+        </div>
+    );
+};
+
+export default function App() {
+  const [view, setView] = useState('apartment');
+  const [gameTime, setGameTime] = useState({ year: 2008, week: 1 });
+  const [balance, setBalance] = useState(10000); 
+  const [stocks, setStocks] = useState(INITIAL_STOCKS);
+  const [portfolio, setPortfolio] = useState({});
+  
+  // --- CHEAT CODE STATE ---
+  const [cheatCodeInput, setCheatCodeInput] = useState('');
+  const [showCheatModal, setShowCheatModal] = useState(false);
+
+  // --- MILESTONES & INSIDER ---
+  const [milestoneIndex, setMilestoneIndex] = useState(0);
+  const [insiderUnlocked, setInsiderUnlocked] = useState(false);
+  const [pendingInsiderTips, setPendingInsiderEvents] = useState([]);
+  const [showMilestoneModal, setShowMilestoneModal] = useState(false);
+  const [milestoneData, setMilestoneData] = useState(null);
+  
+  // --- PRIVATE EQUITY & SUPERCELL ---
+  const [privateEquity, setPrivateEquity] = useState([]); 
+  const [pendingStartup, setPendingStartup] = useState(null); 
+  const [showStartupModal, setShowStartupModal] = useState(false);
+  const [supercellRejected, setSupercellRejected] = useState(false);
+
+  // --- RELATIVE REQUESTS ---
+  const [pendingRelative, setPendingRelative] = useState(null);
+  const [showRelativeModal, setShowRelativeModal] = useState(false);
+
+  // --- BOARD MEMBERSHIP ---
+  const [boardMemberships, setBoardMemberships] = useState([]);
+  const [pendingBoardIssue, setPendingBoardIssue] = useState(null);
+  const [showBoardModal, setShowBoardModal] = useState(false);
+
+  // --- ACHIEVEMENTS ---
+  const [showAchievementsModal, setShowAchievementsModal] = useState(false);
+
+  const [newsFeed, setNewsFeed] = useState([]); 
+  const [showNewsModal, setShowNewsModal] = useState(false);
+  const [showMonthRecapModal, setShowMonthRecapModal] = useState(false);
+  const [monthRecapData, setMonthRecapData] = useState(null);
+  const [transactionLog, setTransactionLog] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const [tradeModalStock, setTradeModalStock] = useState(null);
+  const [tradeQuantity, setTradeQuantity] = useState(1);
+  const [sellModalStock, setSellModalStock] = useState(null);
+  const [sellQuantity, setSellQuantity] = useState(1);
+
+  const [triggeredEvents, setTriggeredEvents] = useState([]);
+  const [messageQueue, setMessageQueue] = useState([]);
+  const [showMessageModal, setShowMessageModal] = useState(false);
+  
+  const [showRentModal, setShowRentModal] = useState(false);
+  const [pendingRent, setPendingRent] = useState(null); 
+  const [showIntroModal, setShowIntroModal] = useState(true);
+  
+  // Game Over State
+  const [showGameOver, setShowGameOver] = useState(false);
+
+  const audioRef = useRef(new Audio(TRACK_LOW));
+  const [isMuted, setIsMuted] = useState(false);
+
+  const portfolioValue = stocks.reduce((total, stock) => {
+    const holding = portfolio[stock.symbol];
+    return total + ((holding?.shares || 0) * stock.price);
+  }, 0);
+  const netWorth = balance + portfolioValue;
+
+  const getTargetTrack = (worth) => {
+      if (worth >= 500000) return TRACK_HIGH;
+      if (worth >= 50000) return TRACK_MID;
+      return TRACK_LOW;
+  };
+
+  useEffect(() => {
+      // Audio initialization
+      audioRef.current.loop = true;
+      audioRef.current.volume = 0.5;
+      return () => {
+          if (audioRef.current) audioRef.current.pause();
+      };
+  }, []);
+
+  // Track switching effect
+  useEffect(() => {
+      const targetTrack = getTargetTrack(netWorth);
+      const currentSrc = audioRef.current.src;
+
+      // Loose check because browser resolves URL
+      if (currentSrc !== targetTrack && !currentSrc.includes(targetTrack)) {
+          audioRef.current.src = targetTrack;
+          audioRef.current.loop = true; 
+          if (!showIntroModal && !isMuted) {
+              audioRef.current.play().catch(e => console.log("Playback failed", e));
+          }
+      }
+  }, [netWorth, showIntroModal, isMuted]);
+
+  // --- GAME OVER CHECK (Global Effect) ---
+  useEffect(() => {
+      if (netWorth < 0 && !showGameOver) {
+          setShowGameOver(true);
+      }
+  }, [netWorth, showGameOver]);
+
+  // --- CHEAT CODE EFFECT ---
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Don't capture input if modals are open (roughly checking a few primary ones)
+      if (showIntroModal || showNewsModal || showRentModal || showRelativeModal || showBoardModal || showAchievementsModal) return;
+      if (tradeModalStock || sellModalStock) return; // Also block cheat input if trading
+
+      setCheatCodeInput(prev => {
+        const updated = (prev + e.key).slice(-15); // Keep last 15 chars
+        const lower = updated.toLowerCase();
+
+        if (lower.endsWith('timetravel')) {
+          setShowCheatModal(true);
+          return '';
+        }
+
+        if (lower.endsWith('amirichyet')) {
+          setBalance(prevBalance => prevBalance + 12500);
+          setTransactionLog(prev => [`CHEAT: +$25,000 CASH`, ...prev.slice(0, 4)]);
+          return '';
+        }
+
+        return updated;
+      });
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showIntroModal, showNewsModal, showRentModal, showRelativeModal, showBoardModal, tradeModalStock, sellModalStock]);
+
+  const toggleMute = () => { 
+      if (audioRef.current) { 
+          audioRef.current.muted = !isMuted; 
+          setIsMuted(!isMuted); 
+      } 
+  };
+  
+  const startMusic = () => { 
+      if (audioRef.current) { 
+          const target = getTargetTrack(netWorth);
+          if (audioRef.current.src !== target && !audioRef.current.src.includes(target)) {
+              audioRef.current.src = target;
+          }
+          audioRef.current.play().catch(e => console.log("Audio autoplay prevented", e)); 
+      } 
+  };
+
+  // --- INSIDER LOGIC ---
+  const buyInsiderTip = async () => {
+    if (balance < 500) return;
+    
+    setIsLoading(true);
+
+    setBalance(prev => prev - 500);
+    setTransactionLog(prev => [`Bought Insider Info (-$500)`, ...prev.slice(0, 4)]);
+    
+    const tipData = await generateInsiderTip(stocks);
+    
+    const isReal = Math.random() < 0.70;
+    if (isReal) {
+       const targetWeek = gameTime.week + 1 > 52 ? 1 : gameTime.week + 1;
+       const targetYear = gameTime.week + 1 > 52 ? gameTime.year + 1 : gameTime.year;
+       const tipEvent = { id: `insider_${Date.now()}`, year: targetYear, week: targetWeek, triggerType: 'insider', symbol: tipData.symbol, impact: { [tipData.symbol]: tipData.impact } };
+       setPendingInsiderEvents(prev => [...prev, tipEvent]);
+    }
+    setMessageQueue(prev => [...prev, { sender: "Unknown", text: `[TIP] ${tipData.text}` }]);
+    setShowMessageModal(true);
+    
+    setIsLoading(false);
+  };
+
+  // --- PRIVATE EQUITY LOGIC ---
+
+  const checkStartupEvents = async (year, week) => {
+      // 1. Check for Supercell Easter Egg (2009 Week 36)
+      if (year === 2009 && week === 36 && !supercellRejected) {
+          // ALWAYS TRIGGER (100% Chance) unless already rejected
+          setPendingStartup({
+              founder: "Ilkka Paananen",
+              company: "Supercell",
+              pitch: "I'm starting a mobile gaming company in Helsinki. We're going to make games that people play for years - games as a service, not one-hit wonders.",
+              ask: 5000,
+              equity: 5,
+              successChance: 78,
+              isSupercell: true
+          });
+          setShowStartupModal(true);
+          return true;
+      }
+
+      // 2. Standard Random Pitches
+      const yearOffset = year - 2008;
+      const targetWeek1 = 27 - yearOffset;
+      const targetWeek2 = 45 - yearOffset;
+
+      if (week === targetWeek1 || week === targetWeek2) {
+          const pitch = await generateStartupPitch(netWorth, year);
+          setPendingStartup(pitch);
+          setShowStartupModal(true);
+          return true; // Event triggered
+      }
+      
+      // Expiry Logic: Only clear random startups if ignored, mark Supercell as rejected
+      if (pendingStartup && week !== targetWeek1 && week !== targetWeek2 && week !== 36) {
+          if (pendingStartup.isSupercell) {
+              setSupercellRejected(true);
+          }
+          setPendingStartup(null);
+          setShowStartupModal(false);
+      }
+      return false;
+  };
+
+  const processPrivateEquityUpdates = (currentEquity, currentWeek, currentYear) => {
+      let dividendsTotal = 0;
+      const updatedEquity = currentEquity.map(company => {
+          // IMPROVED: 13-Week Quarterly Check with Boundary Crossing Detection
+          const currentAbsWeek = (currentYear * 52) + currentWeek;
+          const acquiredAbsWeek = (company.yearAcquired * 52) + company.weekAcquired;
+          
+          const lastAbsWeek = currentAbsWeek - 1;
+          const weeksSince = currentAbsWeek - acquiredAbsWeek;
+          const lastWeeksSince = lastAbsWeek - acquiredAbsWeek;
+
+          // Update Valuation for Supercell (Annual check based on map)
+          let currentValuation = company.currentValuation;
+          if (company.isSupercell) {
+             const growthData = SUPERCELL_GROWTH[currentYear];
+             if (growthData && growthData.value !== currentValuation) {
+                 currentValuation = growthData.value;
+             }
+          }
+
+          // Trigger Dividend/Growth if 13-week boundary crossed (ROBUST METHOD FROM DOC 1)
+          if (weeksSince > 0 && Math.floor(weeksSince / 13) > Math.floor(lastWeeksSince / 13)) {
+              
+              // SUPERCELL DIVIDEND
+              if (company.isSupercell) {
+                  const divAmount = currentValuation * 0.02; // 2% quarterly
+                  dividendsTotal += divAmount;
+                  return { ...company, currentValuation };
+              }
+              
+              // STANDARD STARTUP LOGIC
+              const success = company.successChance;
+              let growthPercent = 0;
+              let isGrowth = false;
+
+              if (success > 50) {
+                  const min = (success * 0.1) / 4;
+                  const max = success / 4;
+                  growthPercent = (Math.random() * (max - min) + min) / 100;
+                  isGrowth = true;
+              } else {
+                  const min = -(success * 0.1) / 2; 
+                  const max = success / 3;
+                  growthPercent = (Math.random() * (max - min) + min) / 100;
+                  isGrowth = growthPercent > 0;
+              }
+
+              const newValuation = currentValuation * (1 + growthPercent);
+              
+              if (isGrowth) {
+                  const divAmount = newValuation * 0.05 * (success / 100);
+                  dividendsTotal += divAmount;
+              }
+
+              return { ...company, currentValuation: newValuation };
+          }
+          
+          return { ...company, currentValuation };
+      });
+
+      return { updatedEquity, dividendsTotal };
+  };
+
+  const investInStartup = () => {
+      if (pendingStartup && balance >= pendingStartup.ask) {
+          setBalance(prev => prev - pendingStartup.ask);
+          const newInvestment = {
+              ...pendingStartup,
+              currentValuation: pendingStartup.ask, // Initial value = investment
+              weekAcquired: gameTime.week,
+              yearAcquired: gameTime.year
+          };
+          setPrivateEquity(prev => [...prev, newInvestment]);
+          setPendingStartup(null);
+          setShowStartupModal(false);
+          setTransactionLog(prev => [`Invested $${pendingStartup.ask} in ${pendingStartup.company}`, ...prev.slice(0, 4)]);
+      }
+  };
+
+  // --- RELATIVE REQUEST LOGIC ---
+  const payRelative = () => {
+      if (pendingRelative && balance >= pendingRelative.amount) {
+          setBalance(prev => prev - pendingRelative.amount);
+          setTransactionLog(prev => [`Gave $${pendingRelative.amount} to ${pendingRelative.relation}`, ...prev.slice(0, 4)]);
+          setShowRelativeModal(false);
+          setPendingRelative(null);
+      }
+  };
+
+  const blockRelative = () => {
+      if (pendingRelative) {
+          setTransactionLog(prev => [`Blocked ${pendingRelative.relation}`, ...prev.slice(0, 4)]);
+          setShowRelativeModal(false);
+          setPendingRelative(null);
+      }
+  };
+
+  // --- BOARD MEMBER LOGIC ---
+  const handleBoardVote = (voteYes) => {
+      if (!pendingBoardIssue) return;
+
+      const impact = voteYes ? pendingBoardIssue.yesImpact : pendingBoardIssue.noImpact;
+      const outcomeMsg = voteYes ? pendingBoardIssue.yesOutcome : pendingBoardIssue.noOutcome;
+      const symbol = pendingBoardIssue.symbol;
+
+      // Apply stock impact
+      setStocks(prevStocks => prevStocks.map(s => {
+          if (s.symbol === symbol) {
+              const newPrice = Math.max(0.5, s.price * (1 + impact));
+              return { ...s, price: parseFloat(newPrice.toFixed(2)), history: [...s.history, newPrice] };
+          }
+          return s;
+      }));
+
+      // Add Outcome to message queue
+      setMessageQueue(prev => [...prev, { sender: "Board Secretary", text: outcomeMsg }]);
+      setShowMessageModal(true);
+      setShowBoardModal(false);
+      setPendingBoardIssue(null);
+      setTransactionLog(prev => [`Voted on Board Issue for ${symbol}`, ...prev.slice(0, 4)]);
+  };
+
+  // --- CORE GAME LOOP ---
+
+  const checkRentDue = (year, week) => {
+    const totalWeeks = (year - 2008) * 52 + week;
+    if (totalWeeks >= 10 && (totalWeeks - 10) % 12 === 0) {
+      const isHike = year >= 2011;
+      const amount = isHike ? 1000 : 900;
+      const isFirstHike = year === 2011 && (totalWeeks - 10) % 12 === 0 && week <= 12; 
+      const isFirstRent = totalWeeks === 10;
+
+      let message = null;
+      let context = null;
+
+      if (isFirstRent) {
+         message = "I know you're on tough times son, but I gotta feed my family too, please pay up the rent.";
+      } else {
+         if (isFirstHike) {
+            context = "Bad news Steve. Inflation is crazy. I gotta raise the rent to $1,000. I know, I know. Just pay what you can.";
+         } else if (isHike) {
+            context = "Rent is due again ($1000). Mention inflation or groceries being expensive.";
+         } else {
+            context = "Rent is due ($900). Be nagging but familar.";
+         }
+      }
+
+      return { amount, message, context, isFirst: isFirstRent };
+    }
+    return null;
+  };
+
+  const checkScriptedEvents = (year, week, currentStocks, currentPortfolio, currentNetWorth) => {
+    let triggered = null;
+    let impacts = {};
+    let messageContext = null;
+
+    // 1. Fixed Scripted Events
+    const dateEvent = SCRIPTED_EVENTS.find(e => 
+      e.year === year && e.week === week && e.triggerType === 'date' && !triggeredEvents.includes(e.id)
+    );
+    if (dateEvent) triggered = dateEvent;
+
+    // 2. Pending Insider Tips
+    const insiderEvent = pendingInsiderTips.find(e => e.year === year && e.week === week);
+    if (insiderEvent) {
+        if (!triggered) {
+             triggered = {
+                 id: insiderEvent.id,
+                 impact: insiderEvent.impact,
+                 sender: null, 
+                 headline: null 
+             };
+             // Clean up used tip
+             setPendingInsiderEvents(prev => prev.filter(e => e.id !== insiderEvent.id));
+        } else {
+            // Collision: just add impact
+            impacts = { ...impacts, ...insiderEvent.impact };
+            setPendingInsiderEvents(prev => prev.filter(e => e.id !== insiderEvent.id));
+        }
+    }
+
+    if (!triggered) {
+      const holdEvent = SCRIPTED_EVENTS.find(e => 
+        e.triggerType === 'holding_threshold' && 
+        !triggeredEvents.includes(e.id) &&
+        (currentPortfolio[e.symbol]?.shares || 0) >= e.threshold &&
+        e.year === year && e.week === week
+      );
+      if (holdEvent) triggered = holdEvent;
+    }
+
+    if (!triggered && currentNetWorth >= 20000 && currentNetWorth <= 25000 && !triggeredEvents.includes('tier5_double_up')) {
+       const holdings = Object.keys(currentPortfolio).filter(k => currentPortfolio[k]?.shares > 0);
+       if (holdings.length > 0) {
+          const randomSymbol = holdings[Math.floor(Math.random() * holdings.length)];
+          triggered = {
+             id: 'tier5_double_up',
+             headline: `${randomSymbol} SMASHES EARNINGS: ANALYSTS SHOCKED`,
+             impact: { [randomSymbol]: 0.80 },
+             sender: "Unknown",
+             context: `You are excited. ${randomSymbol} just had insane earnings and is up 80%. Tell Steve to look at his portfolio.`
+          };
+       }
+    }
+
+    if (triggered) {
+       if (triggered.impact) impacts = { ...impacts, ...triggered.impact };
+       if (triggered.context) {
+          messageContext = triggered.context;
+       }
+    }
+
+    return { event: triggered, impacts, messageContext };
+  };
+
+  const processMarketUpdates = (currentStocks, currentNews, currentYear, currentWeek, scriptedImpacts = {}) => {
+    const historicalEvent = HISTORICAL_EVENTS.find(e => e.year === currentYear && e.week === currentWeek);
+    const marketBias = getMarketSentiment(currentYear, currentWeek);
+
+    return currentStocks.map(stock => {
+      let changePercent = (Math.random() - 0.5) * stock.volatility;
+      changePercent += marketBias;
+
+      if (historicalEvent && historicalEvent.global) {
+        changePercent += historicalEvent.impact;
+      }
+
+      // IMPROVED LOGIC: Prioritize explicit scripted impacts over random news for the same stock
+      let hasExplicitImpact = false;
+
+      if (scriptedImpacts && scriptedImpacts[stock.symbol]) {
+         changePercent += scriptedImpacts[stock.symbol];
+         hasExplicitImpact = true;
+      }
+      if (scriptedImpacts && scriptedImpacts['MARKET']) {
+         changePercent += scriptedImpacts['MARKET'];
+      }
+      
+      const newsItem = currentNews.find(n => n.stockSymbol === stock.symbol);
+      if (newsItem && !hasExplicitImpact) {
+        // Only apply news impact if there wasn't already a scripted/insider impact for this specific stock
+        // This prevents double-counting when we generate a "headline" for a scripted event
+        const impact = newsItem.signal === 'UP' ? newsItem.percentage : -newsItem.percentage;
+        changePercent += impact;
+      }
+
+      const newPrice = Math.max(0.5, stock.price * (1 + changePercent));
+      
+      return {
+        ...stock,
+        price: parseFloat(newPrice.toFixed(2)),
+        history: [...stock.history, newPrice]
+      };
+    });
+  };
+
+  const checkMilestones = async (currentNetWorth) => {
+     if (milestoneIndex < MILESTONES.length && currentNetWorth >= MILESTONES[milestoneIndex]) {
+        const milestoneAmount = MILESTONES[milestoneIndex];
+        let msg = "";
+        if (milestoneAmount === 50000) {
+            msg = "Congratulations, looks like your gamble has paid off. Your net worth is now the same as your last drawn annual salary.";
+        } else {
+            msg = await generateMilestoneMessage(milestoneAmount);
+        }
+        setMilestoneData({ amount: milestoneAmount, message: msg });
+        setShowMilestoneModal(true);
+        setMilestoneIndex(prev => prev + 1);
+
+        if (milestoneAmount === 50000) { 
+            setInsiderUnlocked(true);
+            setMessageQueue(prev => [...prev, {
+                sender: "Unknown",
+                text: "Looks like you're moving up in the world. I am going to give you the privilege of information, for the low price of 500 per tip."
+            }]);
+            setShowMessageModal(true); 
+        }
+     }
+  };
+
+  const advanceWeek = async () => {
+    setIsLoading(true);
+    
+    const nextWeek = gameTime.week + 1 > 52 ? 1 : gameTime.week + 1;
+    const nextYear = gameTime.week + 1 > 52 ? gameTime.year + 1 : gameTime.year;
+
+    // --- CHECK RENT ---
+    const rent = checkRentDue(nextYear, nextWeek);
+    if (rent) {
+      let rentMsg = rent.message;
+      if (!rentMsg && rent.context) {
+         rentMsg = await generatePersonaMessage("Uncle Jacob", rent.context);
+      }
+      setPendingRent({ amount: rent.amount, message: rentMsg });
+      setShowRentModal(true);
+    }
+
+    // --- CHECK RELATIVE REQUEST ---
+    if (nextWeek === 17) {
+        const req = await generateRelativeRequest(nextYear);
+        setPendingRelative(req);
+        setShowRelativeModal(true);
+    }
+
+    // --- CHECK BOARD INVITE ---
+    const potentialBoards = Object.keys(portfolio).filter(sym => 
+        portfolio[sym].shares >= 10000 && !boardMemberships.includes(sym)
+    );
+
+    let boardInviteFound = null;
+    if (potentialBoards.length > 0) {
+        // Just pick first one to avoid spam
+        const sym = potentialBoards[0];
+        const stock = stocks.find(s => s.symbol === sym);
+        if (stock) {
+            const boardQ = await generateBoardQuestion(stock);
+            boardInviteFound = { ...boardQ, symbol: sym };
+            // Mark as member immediately so we don't re-trigger
+            setBoardMemberships(prev => [...prev, sym]);
+        }
+    }
+
+    if (boardInviteFound) {
+        setPendingBoardIssue(boardInviteFound);
+        setShowBoardModal(true);
+    }
+
+    // --- CHECK SCRIPTED EVENTS ---
+    const scripted = checkScriptedEvents(nextYear, nextWeek, stocks, portfolio, netWorth);
+    let extraNews = [];
+    let scriptedImpacts = scripted.impacts;
+    let excludedSymbols = [];
+
+    if (scripted.event) {
+        if (scripted.event.id && !scripted.event.id.startsWith('insider')) {
+            setTriggeredEvents(prev => [...prev, scripted.event.id]);
+        }
+        
+        if (scripted.messageContext) {
+            const aiMsg = await generatePersonaMessage(scripted.event.sender || "Unknown", scripted.messageContext);
+            setMessageQueue(prev => [...prev, { sender: scripted.event.sender || "Unknown", text: aiMsg }]);
+            setShowMessageModal(true);
+        }
+
+        let displayPercent = 0;
+        if (scripted.event.impact) {
+           const values = Object.values(scripted.event.impact);
+           if (values.length > 0) {
+              let maxVal = values.reduce((max, n) => Math.abs(n) > Math.abs(max) ? n : max, 0);
+              displayPercent = Math.abs(maxVal);
+           }
+        }
+
+        if (scripted.impacts) excludedSymbols = Object.keys(scripted.impacts);
+
+        if (scripted.event.headline) {
+            extraNews.push({
+                headline: scripted.event.headline,
+                stockSymbol: Object.keys(scripted.event.impact)[0] || "ALERT",
+                signal: "UP", 
+                percentage: displayPercent, 
+                severity: "HIGH"
+            });
+        }
+        if (scripted.event.impactOverride) {
+             Object.keys(scripted.event.impactOverride).forEach(sym => {
+                 scriptedImpacts[sym] = scripted.event.impactOverride[sym] - (scripted.event.impact['MARKET'] || 0);
+             });
+        }
+    }
+
+    const historicalEvent = HISTORICAL_EVENTS.find(e => e.year === nextYear && e.week === nextWeek);
+    let weeklyNews = [];
+    if (historicalEvent) {
+      weeklyNews = [{
+        headline: historicalEvent.headline,
+        stockSymbol: "MARKET",
+        signal: historicalEvent.impact >= 0 ? "UP" : "DOWN",
+        percentage: Math.abs(historicalEvent.impact),
+        severity: "HIGH"
+      }];
+    } else {
+      const numHeadlines = Math.floor(Math.random() * 5); 
+      weeklyNews = await fetchGeminiNews(stocks, portfolio, numHeadlines, nextYear, excludedSymbols);
+    }
+
+    const finalNews = [...extraNews, ...weeklyNews];
+    setNewsFeed(finalNews);
+    if (finalNews.length > 0) setShowNewsModal(true);
+
+    const newStocks = processMarketUpdates(stocks, weeklyNews, nextYear, nextWeek, scriptedImpacts);
+    setStocks(newStocks);
+    setGameTime({ year: nextYear, week: nextWeek });
+    
+    // 1. Private Equity Updates (with IMPROVED boundary crossing check)
+    const { updatedEquity, dividendsTotal } = processPrivateEquityUpdates(privateEquity, nextWeek, nextYear);
+    if (dividendsTotal > 0) {
+        setBalance(prev => prev + dividendsTotal);
+        setMessageQueue(prev => [...prev, { sender: "Bank", text: `Dividends Received: $${dividendsTotal.toFixed(2)}` }]);
+        setShowMessageModal(true);
+    }
+    setPrivateEquity(updatedEquity);
+
+    // 2. Check Startup Pitches
+    await checkStartupEvents(nextYear, nextWeek);
+    
+    const newNetWorth = balance + newStocks.reduce((total, stock) => total + ((portfolio[stock.symbol]?.shares || 0) * stock.price), 0);
+    await checkMilestones(newNetWorth);
+
+    setIsLoading(false);
+  };
+
+  const advanceMonth = async () => {
+    setIsLoading(true);
+    const startWeek = gameTime.week;
+    const startWorth = netWorth;
+
+    let monthExcludedSymbols = [];
+    let tempYear = gameTime.year;
+    let tempWeek = gameTime.week;
+    for (let j = 0; j < 4; j++) {
+        tempWeek++;
+        if (tempWeek > 52) { tempWeek = 1; tempYear++; }
+        const upcomingEvent = SCRIPTED_EVENTS.find(e => 
+            e.year === tempYear && e.week === tempWeek && e.triggerType === 'date'
+        );
+        if (upcomingEvent && upcomingEvent.impact) {
+            monthExcludedSymbols.push(...Object.keys(upcomingEvent.impact));
+        }
+    }
+
+    const monthlyNews = await fetchGeminiNews(stocks, portfolio, 4, gameTime.year, monthExcludedSymbols); 
+    let allMonthNews = [];
+
+    let currentStocksState = [...stocks];
+    let simYear = gameTime.year;
+    let simWeek = gameTime.week;
+    let accumulatedMessages = [];
+    let rentFound = null;
+    let relativeFound = null;
+    let startupFound = false;
+    let boardInviteFound = null;
+    let totalDividends = 0;
+    let currentEquityState = [...privateEquity];
+
+    for (let i = 0; i < 4; i++) {
+        simWeek++;
+        if (simWeek > 52) { simWeek = 1; simYear++; }
+
+        // IMPROVED: Use boundary crossing method for month skip
+        const peResult = processPrivateEquityUpdates(currentEquityState, simWeek, simYear);
+        currentEquityState = peResult.updatedEquity;
+        totalDividends += peResult.dividendsTotal;
+
+        if (!startupFound) {
+             const hasStartup = await checkStartupEvents(simYear, simWeek); 
+             if (hasStartup) startupFound = true;
+        }
+
+        const rent = checkRentDue(simYear, simWeek);
+        if (rent) {
+           let rentMsg = rent.message;
+           if (!rentMsg && rent.context) {
+              rentMsg = await generatePersonaMessage("Uncle Jacob", rent.context);
+           }
+           rentFound = { ...rent, message: rentMsg };
+        }
+
+        // Relative Request
+        if (simWeek === 17) {
+            relativeFound = await generateRelativeRequest(simYear);
+        }
+
+        // Board Check - Only check if we haven't found one yet this month
+        if (!boardInviteFound) {
+            const potentialBoards = Object.keys(portfolio).filter(sym => 
+                portfolio[sym].shares >= 10000 && !boardMemberships.includes(sym)
+            );
+            
+            if (potentialBoards.length > 0) {
+                const sym = potentialBoards[0];
+                const stock = currentStocksState.find(s => s.symbol === sym);
+                if (stock) {
+                    const boardQ = await generateBoardQuestion(stock);
+                    boardInviteFound = { ...boardQ, symbol: sym };
+                    setBoardMemberships(prev => [...prev, sym]);
+                }
+            }
+        }
+
+        const currentSimNetWorth = balance + currentStocksState.reduce((t, s) => {
+             return t + ((portfolio[s.symbol]?.shares || 0) * s.price);
+        }, 0);
+
+        const scripted = checkScriptedEvents(simYear, simWeek, currentStocksState, portfolio, currentSimNetWorth);
+        let scriptedImpacts = scripted.impacts;
+        
+        if (scripted.event) {
+            if (scripted.event.id && !scripted.event.id.startsWith('insider')) {
+                setTriggeredEvents(prev => [...prev, scripted.event.id]);
+            }
+            if (scripted.messageContext) {
+                const aiMsg = await generatePersonaMessage(scripted.event.sender || "Unknown", scripted.messageContext);
+                accumulatedMessages.push({ sender: scripted.event.sender || "Unknown", text: aiMsg });
+            }
+
+            if (scripted.event.impactOverride) {
+                 Object.keys(scripted.event.impactOverride).forEach(sym => {
+                     scriptedImpacts[sym] = scripted.event.impactOverride[sym] - (scripted.event.impact['MARKET'] || 0);
+                 });
+            }
+            
+            // Fix ALERT +0.0% bug in month skip
+            let displayPercent = 0;
+            let displaySymbol = "ALERT";
+            let displaySignal = "UP";
+
+            if (scripted.event.impact) {
+               const keys = Object.keys(scripted.event.impact);
+               if (keys.length > 0) displaySymbol = keys[0];
+               
+               const values = Object.values(scripted.event.impact);
+               if (values.length > 0) {
+                  let maxVal = values.reduce((max, n) => Math.abs(n) > Math.abs(max) ? n : max, 0);
+                  displayPercent = Math.abs(maxVal);
+                  displaySignal = maxVal >= 0 ? "UP" : "DOWN";
+               }
+            }
+
+            if (scripted.event.headline) {
+                allMonthNews.push({
+                    headline: scripted.event.headline,
+                    stockSymbol: displaySymbol,
+                    signal: displaySignal, 
+                    percentage: displayPercent,
+                    week: simWeek
+                });
+            }
+        }
+
+        const historicalEvent = HISTORICAL_EVENTS.find(e => e.year === simYear && e.week === simWeek);
+        let weeksNews = [];
+
+        if (historicalEvent) {
+           weeksNews = [{
+             headline: historicalEvent.headline,
+             stockSymbol: "MARKET",
+             signal: historicalEvent.impact >= 0 ? "UP" : "DOWN",
+             percentage: Math.abs(historicalEvent.impact),
+             severity: "HIGH",
+             week: simWeek
+           }];
+        } else {
+           if (monthlyNews[i]) {
+             weeksNews = [{ ...monthlyNews[i], week: simWeek }];
+           }
+        }
+        
+        allMonthNews = [...allMonthNews, ...weeksNews];
+        currentStocksState = processMarketUpdates(currentStocksState, weeksNews, simYear, simWeek, scriptedImpacts);
+    }
+
+    setStocks(currentStocksState);
+    setPrivateEquity(currentEquityState);
+    if (totalDividends > 0) {
+        setBalance(prev => prev + totalDividends);
+        accumulatedMessages.push({ sender: "Bank", text: `Dividends Received: $${totalDividends.toFixed(2)}` });
+    }
+    setGameTime({ year: simYear, week: simWeek });
+
+    const newPortfolioValue = currentStocksState.reduce((total, stock) => {
+        const holding = portfolio[stock.symbol];
+        return total + ((holding?.shares || 0) * stock.price);
+    }, 0);
+    const endWorth = balance + newPortfolioValue + totalDividends; 
+
+    setMonthRecapData({
+        news: allMonthNews,
+        startWeek,
+        endWeek: simWeek, 
+        year: simYear,
+        startWorth,
+        endWorth
+    });
+    
+    if (accumulatedMessages.length > 0) {
+        setMessageQueue(prev => [...prev, ...accumulatedMessages]);
+    }
+
+    if (rentFound) {
+      setPendingRent(rentFound);
+    }
+
+    if (relativeFound) {
+        setPendingRelative(relativeFound);
+    }
+
+    if (boardInviteFound) {
+        setPendingBoardIssue(boardInviteFound);
+    }
+    
+    await checkMilestones(endWorth);
+
+    setShowMonthRecapModal(true);
+    setIsLoading(false);
+  };
+
+  const buyStock = (symbol, price, quantity) => {
+    // Safety handling
+    const qty = (typeof quantity === 'string' && quantity === '') ? 0 : quantity;
+    if (qty <= 0) return;
+
+    const cost = price * qty;
+    if (balance >= cost) {
+      setBalance(prev => prev - cost);
+      setPortfolio(prev => {
+        const current = prev[symbol] || { shares: 0, avgCost: 0, totalCost: 0 };
+        const newShares = current.shares + qty;
+        const newTotalCost = current.totalCost + cost;
+        const newAvgCost = newTotalCost / newShares;
+        
+        return {
+          ...prev,
+          [symbol]: {
+            shares: newShares,
+            avgCost: newAvgCost,
+            totalCost: newTotalCost
+          }
+        };
+      });
+      setTransactionLog(prev => [`Bought ${qty} ${symbol} @ $${price.toFixed(2)}`, ...prev.slice(0, 4)]);
+      setTradeModalStock(null); 
+    }
+  };
+
+  const sellStock = (symbol, price, quantity) => {
+    // Safety handling
+    const qty = (typeof quantity === 'string' && quantity === '') ? 0 : quantity;
+    if (qty <= 0) return;
+
+    const current = portfolio[symbol];
+    if (current && current.shares >= qty) {
+      setBalance(prev => prev + (price * qty));
+      setPortfolio(prev => {
+        const newShares = current.shares - qty;
+        const newTotalCost = newShares * current.avgCost; 
+        
+        if (newShares === 0) {
+          const newPortfolio = { ...prev };
+          delete newPortfolio[symbol];
+          return newPortfolio;
+        }
+
+        return {
+          ...prev,
+          [symbol]: {
+            ...current,
+            shares: newShares,
+            totalCost: newTotalCost
+          }
+        };
+      });
+      setTransactionLog(prev => [`Sold ${qty} ${symbol} @ $${price.toFixed(2)}`, ...prev.slice(0, 4)]);
+      setSellModalStock(null);
+    }
+  };
+
+  const payRent = () => {
+    if (pendingRent) {
+      setBalance(prev => prev - pendingRent.amount);
+      setTransactionLog(prev => [`PAID RENT $${pendingRent.amount}`, ...prev.slice(0, 4)]);
+      setShowRentModal(false);
+      setPendingRent(null);
+    }
+  };
+
+  const openTradeModal = (stock) => { setTradeModalStock(stock); setTradeQuantity(1); };
+  
+  const openSellModal = (stock) => {
+    setSellModalStock(stock);
+    setSellQuantity(1);
+  };
+
+  const restartGame = () => {
+      window.location.reload();
+  };
+
+  // --- VIEW COMPONENTS ---
+
+  const ApartmentView = () => {
+    let activeImages = APARTMENT_IMAGES_TIER_0;
+    if (netWorth >= 500000) activeImages = APARTMENT_IMAGES_TIER_3;
+    else if (netWorth >= 100000) activeImages = APARTMENT_IMAGES_TIER_2;
+    else if (netWorth >= 50000) activeImages = APARTMENT_IMAGES_TIER_1;
+
+    const activeImageIndex = (gameTime.week - 1) % activeImages.length;
+
+    return (
+      <div className="relative w-full h-full bg-black flex items-center justify-center overflow-hidden">
+        <div className="relative w-full h-full" style={{ maxWidth: '100%', maxHeight: '100%', aspectRatio: '2816 / 1536' }}>
+          {activeImages.map((imgUrl, index) => (
+            <div key={index} className={`absolute inset-0 bg-contain bg-center bg-no-repeat transition-opacity duration-1000 ease-in-out ${index === activeImageIndex ? 'opacity-100 z-10' : 'opacity-0 z-0'}`} style={{ backgroundImage: `url(${imgUrl})` }} />
+          ))}
+
+          <div className="absolute group cursor-pointer z-20" style={{ top: 0, left: 0, width: '100%', height: '100%', clipPath: 'polygon(17.51% 41.21%, 34.55% 41.67%, 35.19% 66.54%, 18.54% 70.25%)' }} onClick={() => setView('terminal')}>
+            <div className="absolute top-[55%] left-[26%] -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <div className="bg-black/90 text-green-400 text-xs font-mono px-3 py-1 rounded border border-green-500 backdrop-blur-md shadow-[0_0_15px_rgba(0,255,0,0.3)]">
+                    ACCESS TERMINAL
+                </div>
+            </div>
+          </div>
+
+          <div className="absolute top-4 left-4 z-40 flex flex-col gap-2">
+             <button onClick={toggleMute} className="text-white/50 hover:text-white transition-colors p-2 bg-black/30 rounded-full backdrop-blur-sm">
+                {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+             </button>
+             <button onClick={(e) => { e.stopPropagation(); setShowAchievementsModal(true); }} className="text-yellow-500/80 hover:text-yellow-400 transition-colors p-2 bg-black/30 rounded-full backdrop-blur-sm">
+                <Trophy size={16} />
+             </button>
+          </div>
+
+          <div className="absolute top-[4%] right-[2%] flex flex-col items-end gap-2 z-30">
+              <div className="backdrop-blur-md bg-black/70 border border-white/10 p-3 rounded-lg shadow-xl text-white min-w-[180px] text-right transform scale-90 origin-top-right">
+                  <div className="text-[10px] text-gray-400 font-mono tracking-widest uppercase mb-1">Current Net Worth</div>
+                  <div className={`text-2xl font-bold font-mono ${netWorth > 1000 ? 'text-green-400' : 'text-white'}`}>
+                      ${Math.floor(netWorth).toLocaleString()}
+                  </div>
+                  <div className="flex justify-between mt-1 text-[8px] text-gray-400">
+                      <span>${Math.floor(balance).toLocaleString()}</span>
+                      <span className="text-yellow-500">TARGET: ${MILESTONES[milestoneIndex]?.toLocaleString() || "1M+"}</span>
+                  </div>
+              </div>
+              
+              {/* PENDING STARTUP NOTIFICATION */}
+              {pendingStartup && !showStartupModal && (
+                  <button onClick={() => setShowStartupModal(true)} className="group relative px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-mono text-xs font-bold border border-blue-400 rounded transition-all duration-300 transform scale-90 origin-top-right flex items-center gap-2 shadow-lg animate-bounce">
+                      <Lightbulb size={16} className="text-yellow-300" /> NEW PITCH!
+                  </button>
+              )}
+
+              <div className="backdrop-blur-md bg-black/70 border border-white/10 p-2 rounded-lg shadow-xl text-white flex items-center gap-3 transform scale-90 origin-top-right">
+                  <div className="flex flex-col text-right">
+                      <span className="text-[10px] text-gray-400 font-mono">WEEK</span>
+                      <span className="text-xs font-bold font-mono">{gameTime.year}</span>
+                  </div>
+                  <div className="bg-white/10 p-2 rounded">
+                      <div className="text-lg font-bold font-mono leading-none">{gameTime.week}</div>
+                  </div>
+              </div>
+
+              <div className="flex flex-col gap-2 items-end transform scale-90 origin-top-right">
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); advanceWeek(); }}
+                    disabled={isLoading}
+                    className="group relative px-4 py-2 bg-green-900/40 hover:bg-green-500/80 text-green-100 hover:text-white font-mono text-xs font-bold border border-green-500/50 rounded transition-all duration-300 flex items-center gap-2 backdrop-blur-md shadow-lg disabled:opacity-50 disabled:cursor-wait w-40 justify-between"
+                  >
+                      {isLoading ? <Loader className="animate-spin" size={14}/> : <span>NEXT WEEK</span>}
+                      {!isLoading && <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />}
+                  </button>
+                  
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); advanceMonth(); }}
+                    disabled={isLoading}
+                    className="group relative px-4 py-2 bg-blue-900/40 hover:bg-blue-500/80 text-blue-100 hover:text-white font-mono text-xs font-bold border border-blue-500/50 rounded transition-all duration-300 flex items-center gap-2 backdrop-blur-md shadow-lg disabled:opacity-50 disabled:cursor-wait w-40 justify-between"
+                  >
+                      {isLoading ? <Loader className="animate-spin" size={14}/> : <span>SKIP MONTH</span>}
+                      {!isLoading && <FastForward size={14} className="group-hover:translate-x-1 transition-transform" />}
+                  </button>
+                  {insiderUnlocked && (
+                    <button onClick={buyInsiderTip} disabled={isLoading || balance < 500} className="group relative px-4 py-2 bg-purple-900/40 hover:bg-purple-500/80 text-purple-100 hover:text-white font-mono text-xs font-bold border border-purple-500/50 rounded transition-all duration-300 flex items-center gap-2 backdrop-blur-md shadow-lg disabled:opacity-50 disabled:cursor-wait w-40 justify-between">
+                        {isLoading ? <Loader className="animate-spin" size={14}/> : <span>PHONE INSIDER (-$500)</span>}
+                        {!isLoading && <Phone size={14} className="group-hover:rotate-12 transition-transform" />}
+                    </button>
+                  )}
+              </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const TradingView = () => {
+    const sortedStocks = [...stocks].sort((a, b) => {
+      const hasA = (portfolio[a.symbol]?.shares || 0) > 0;
+      const hasB = (portfolio[b.symbol]?.shares || 0) > 0;
+      if (hasA && !hasB) return -1;
+      if (!hasA && hasB) return 1;
+      return a.symbol.localeCompare(b.symbol);
+    });
+
+    return (
+      <div className="w-full h-full bg-[#0a0e1a] text-green-500 font-mono flex flex-col p-4 overflow-hidden relative">
+        <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] z-50 bg-[length:100%_2px,3px_100%]"></div>
+        <div className="flex justify-between items-end border-b-2 border-green-800 pb-2 mb-4 shrink-0">
+          <div>
+            <h1 className="text-xl font-bold flex items-center gap-2"><Terminal size={20} /> Charlie Swab <span className="text-xs bg-green-900 text-green-100 px-1 rounded">v3.0</span></h1>
+          </div>
+          <div className="text-right">
+            <div className="text-2xl font-bold text-white">${Math.floor(balance).toLocaleString()}</div>
+            <div className="text-xs text-green-600">LIQUID FUNDS</div>
+          </div>
+          <button onClick={() => setView('apartment')} className="border border-green-700 hover:bg-green-900 hover:text-white px-3 py-1 text-sm rounded transition-colors">LOGOUT</button>
+        </div>
+
+        <div className="flex flex-1 gap-4 min-h-0">
+          <div className="w-1/3 flex flex-col gap-4">
+            <div className="bg-[#0f1623] border border-green-800 p-3 rounded flex-1 overflow-auto custom-scrollbar">
+              <h2 className="text-green-300 mb-2 border-b border-green-900 pb-1 flex items-center gap-2"><Briefcase size={14} /> PORTFOLIO</h2>
+              {/* PRIVATE EQUITY SECTION */}
+              {privateEquity.length > 0 && (
+                  <div className="mb-4 pb-4 border-b border-green-900/50">
+                      <div className="text-xs text-green-500 mb-2 flex items-center gap-1"><PieChart size={10}/> PRIVATE EQUITY (LOCKED)</div>
+                      {privateEquity.map((pe, idx) => (
+                          <div key={idx} className="bg-blue-900/20 p-2 rounded mb-1 text-xs border border-blue-900/30">
+                              <div className="flex justify-between">
+                                  <span className="font-bold text-blue-300">{pe.company}</span>
+                                  <span className="text-blue-200">${pe.currentValuation.toLocaleString()}</span>
+                              </div>
+                              <div className="flex justify-between text-gray-500 text-[10px]">
+                                  <span>{pe.equity}% Equity</span>
+                                  <span>Success: {pe.successChance}%</span>
+                              </div>
+                          </div>
+                      ))}
+                  </div>
+              )}
+
+              {Object.keys(portfolio).filter(k => portfolio[k].shares > 0).length === 0 ? (
+                <div className="text-green-800 text-center mt-10 italic text-sm">NO HOLDINGS DETECTED</div>
+              ) : (
+                <div className="space-y-2">
+                  {Object.entries(portfolio).map(([symbol, data]) => {
+                    if (data.shares <= 0) return null;
+                    const stock = stocks.find(s => s.symbol === symbol);
+                    const currentValue = data.shares * stock.price;
+                    const gainLoss = currentValue - data.totalCost;
+                    const gainPercent = ((gainLoss / data.totalCost) * 100).toFixed(1);
+                    const isGain = gainLoss >= 0;
+                    return (
+                      <div key={symbol} className="flex flex-col text-sm p-2 bg-green-900/10 border border-green-900/30 rounded">
+                        <div className="flex justify-between items-center mb-1">
+                          <div>
+                            <span className="font-bold text-white text-md">{symbol}</span>
+                            <span className="text-xs text-green-600 ml-2">{data.shares} shares</span>
+                          </div>
+                          <div className="text-right">
+                             <div className="text-green-300 font-bold">${currentValue.toFixed(0)}</div>
+                          </div>
+                        </div>
+                        
+                        <div className="flex justify-between items-center text-[10px] text-gray-400 border-t border-green-900/30 pt-1">
+                           <div className="flex gap-2">
+                              <span>AVG: ${data.avgCost.toFixed(2)}</span>
+                              <span>CUR: ${stock.price.toFixed(2)}</span>
+                           </div>
+                           <div className={`${isGain ? 'text-green-400' : 'text-red-400'} font-bold`}>
+                              {isGain ? '+' : ''}{gainPercent}%
+                           </div>
+                        </div>
+
+                        <div className="text-right mt-1">
+                           <button onClick={() => openSellModal(stock)} className="text-[10px] text-red-400 hover:text-red-200 underline">SELL</button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+            <div className="h-32 bg-[#05080f] border border-green-900 p-2 font-mono text-xs overflow-hidden">
+               <div className="text-green-700 mb-1"> SYSTEM_LOG:</div>
+               {transactionLog.map((log, i) => <div key={i} className="text-green-500/70">{'>'} {log}</div>)}
+            </div>
+          </div>
+
+          <div className="w-2/3 bg-[#0f1623] border border-green-800 p-3 rounded flex flex-col">
+            <h2 className="text-green-300 mb-2 border-b border-green-900 pb-1 flex justify-between items-center"><span className="flex items-center gap-2"><TrendingUp size={14} /> Totally Legit Stock Exchange (TLSE)</span><span className="text-xs text-green-600">WK {gameTime.week} / {gameTime.year}</span></h2>
+            <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-1">
+              {sortedStocks.map(stock => {
+                const prevPrice = stock.history[stock.history.length - 2] || stock.price;
+                const change = stock.price - prevPrice;
+                const percent = ((change / prevPrice) * 100).toFixed(1);
+                const isUp = change >= 0;
+                const isOwned = (portfolio[stock.symbol]?.shares || 0) > 0;
+
+                return (
+                  <div key={stock.symbol} className={`relative flex items-center justify-between p-2 border rounded group transition-all ${isOwned ? 'bg-green-900/20 border-green-600' : 'bg-[#0a0e1a] border-green-900/30 hover:border-green-600'}`}>
+                    
+                    {/* HOVER TOOLTIP */}
+                    <div className="absolute left-[35%] top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20 bg-black/90 border border-green-500/80 px-2 py-1 rounded shadow-xl backdrop-blur-sm">
+                        <span className="text-[9px] text-green-300 font-mono tracking-widest whitespace-nowrap">
+                            IND: {SECTOR_MAP[stock.sector]?.toUpperCase() || stock.sector.toUpperCase()}
+                        </span>
+                    </div>
+
+                    <div className="w-1/3">
+                      <div className="font-bold text-sm text-green-100 flex items-center gap-2">
+                        {stock.symbol}
+                        {isOwned && <span className="text-[10px] bg-green-600 text-black px-1 rounded font-bold">OWN</span>}
+                      </div>
+                      <div className="text-[10px] text-green-600 truncate">{stock.name}</div>
+                    </div>
+                    
+                    <div className="w-1/3 text-center">
+                       <div className="h-6 flex items-end justify-center gap-[1px]">
+                          {stock.history.slice(-15).map((h, i) => (
+                             <div key={i} className={`w-1 ${h > stock.history[i-1] ? 'bg-green-500' : 'bg-green-900'}`} style={{ height: `${Math.min(100, (h / 400) * 100)}%` }}></div>
+                          ))}
+                       </div>
+                    </div>
+
+                    <div className="w-1/3 text-right">
+                      <div className="text-sm font-bold text-white">${stock.price.toFixed(2)}</div>
+                      <div className={`text-[10px] ${isUp ? 'text-green-400' : 'text-red-400'} flex items-center justify-end gap-1`}>
+                        {isUp ? <TrendingUp size={10}/> : <TrendingDown size={10}/>}
+                        {percent}%
+                      </div>
+                      <button 
+                        onClick={() => openTradeModal(stock)}
+                        className={`mt-1 px-3 py-0.5 rounded text-[10px] font-bold text-black ${balance >= stock.price ? 'bg-green-500 hover:bg-green-400' : 'bg-green-900 cursor-not-allowed opacity-50'}`}
+                      >
+                        BUY
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="mt-2 pt-2 border-t border-green-900 flex justify-center gap-4">
+              <button 
+                onClick={advanceWeek}
+                disabled={isLoading}
+                className="group relative px-8 py-2 bg-green-900/30 hover:bg-green-500 text-green-400 hover:text-black font-bold tracking-widest border border-green-500 transition-all duration-200 overflow-hidden disabled:opacity-50"
+              >
+                 {isLoading ? <Loader className="animate-spin" size={20}/> : <span className="relative z-10 flex items-center gap-2">NEXT WEEK <ChevronRight size={16} /></span>}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="w-full h-screen font-sans bg-black text-white overflow-hidden">
+      <IntroModal 
+        isOpen={showIntroModal}
+        onClose={() => setShowIntroModal(false)}
+        onStart={startMusic}
+      />
+      {view === 'apartment' ? <ApartmentView /> : <TradingView />}
+      
+      {/* GLOBAL MODALS */}
+      <NewsModal 
+          isOpen={showNewsModal}
+          onClose={() => setShowNewsModal(false)}
+          newsFeed={newsFeed}
+          gameTime={gameTime}
+      />
+      <MonthRecapModal 
+          isOpen={showMonthRecapModal}
+          onClose={() => setShowMonthRecapModal(false)}
+          data={monthRecapData}
+          pendingRent={pendingRent}
+          pendingRelative={pendingRelative}
+          pendingBoardIssue={pendingBoardIssue}
+          messageQueue={messageQueue}
+          setShowRentModal={setShowRentModal}
+          setShowRelativeModal={setShowRelativeModal}
+          setShowBoardModal={setShowBoardModal}
+          setShowMessageModal={setShowMessageModal}
+          stocks={stocks}
+      />
+      <MessageModal 
+          isOpen={showMessageModal}
+          onClose={() => setShowMessageModal(false)}
+          queue={messageQueue}
+          setQueue={setMessageQueue}
+      />
+      <RentModal 
+          isOpen={showRentModal}
+          onClose={() => setShowRentModal(false)}
+          pendingRent={pendingRent}
+          onPay={payRent}
+      />
+      <RelativeModal 
+          isOpen={showRelativeModal}
+          onClose={() => setShowRelativeModal(false)}
+          pendingRelative={pendingRelative}
+          balance={balance}
+          onPay={payRelative}
+          onBlock={blockRelative}
+      />
+      <BoardModal 
+          isOpen={showBoardModal}
+          pendingBoardIssue={pendingBoardIssue}
+          onVote={handleBoardVote}
+      />
+      <TradeModal 
+          stock={tradeModalStock} 
+          setStock={setTradeModalStock}
+          quantity={tradeQuantity}
+          setQuantity={setTradeQuantity}
+          balance={balance}
+          onBuy={buyStock}
+      />
+      <SellModal 
+          stock={sellModalStock} 
+          setStock={setSellModalStock}
+          quantity={sellQuantity}
+          setQuantity={setSellQuantity}
+          portfolio={portfolio}
+          onSell={sellStock}
+      />
+      <StartupModal 
+          isOpen={showStartupModal}
+          onClose={() => setShowStartupModal(false)}
+          pendingStartup={pendingStartup}
+          balance={balance}
+          onInvest={investInStartup}
+          onViewPortfolio={() => { setShowStartupModal(false); setView('terminal'); }}
+      />
+      <MilestoneModal 
+          isOpen={showMilestoneModal}
+          onClose={() => setShowMilestoneModal(false)}
+          data={milestoneData}
+      />
+      <AchievementsModal 
+          isOpen={showAchievementsModal}
+          onClose={() => setShowAchievementsModal(false)}
+      />
+      <GameOverModal 
+          isOpen={showGameOver}
+          onRestart={restartGame}
+      />
+      <CheatModal 
+        isOpen={showCheatModal} 
+        onClose={() => setShowCheatModal(false)}
+        gameTime={gameTime}
+        onTravel={setGameTime}
+      />
+    </div>
+  );
+}
