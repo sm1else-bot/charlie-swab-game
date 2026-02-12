@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Optional: Ensure the root is dark for the game vibe */
+body {
+  background-color: black;
+  margin: 0;
+}
