@@ -16,7 +16,7 @@ const ACHIEVEMENTS_LIST = [
   { title: "Orange", desc: "Reach $100k net worth and switch to an iMac" },
   { title: "Hackerman", desc: "Use a cheat code to gain advantage" },
   { title: "Wolf of Jay St", desc: "Make money off an insider tip" },
-  { title: "Potential", desc: "Invest in Supercell early" },
+  { title: "Potential", desc: "Invest in Blockcraft early" },
   { title: "Board Member", desc: "Get invited to your first corporate board and cast a vote" },
   { title: "Diamond Hands", desc: "Hold a stock through a -30% crash and see it recover to profit" },
   { title: "Portfolio Whale", desc: "Own 10,000+ shares of a single company" },
@@ -105,16 +105,14 @@ const SECTOR_MAP = {
 // --- 🏆 MILESTONES ---
 const MILESTONES = [50000, 100000, 250000, 500000, 1000000];
 
-// --- 🚀 SUPERCELL EASTER EGG DATA ---
-const SUPERCELL_GROWTH = {
+// --- 🎮 BLOCKCRAFT EASTER EGG DATA ---
+const BLOCKCRAFT_GROWTH = {
   2009: { value: 5000 },
-  2010: { value: 7500 },
-  2011: { value: 12000 },
-  2012: { value: 35000 }, // CoC Launch
-  2013: { value: 120000 },
-  2014: { value: 280000 },
-  2015: { value: 450000 },
-  2016: { value: 1200000 } // Tencent Acquisition
+  2010: { value: 30000 },
+  2011: { value: 200000 },
+  2012: { value: 800000 }, // 1.0 release
+  2013: { value: 1800000 },
+  2014: { value: 2500000 }, // Macrohard acquisition
 };
 
 // --- 🎰 SCRIPTED LUCKY EVENTS ---
@@ -379,8 +377,8 @@ const HISTORICAL_EVENTS = [
   { year: 2010, week: 19, headline: "FLASH CRASH: The 'Down Jones' plunges 1000 pts because a cat walked on a keyboard!", impact: -0.09, global: true },
   { year: 2010, week: 20, headline: "Markets stabilize. Cat removed from server room.", impact: 0.05, global: true },
   { year: 2011, week: 32, headline: "National Credit Score downgraded to 'Sketchy'. Panic selling ensues.", impact: -0.07, global: true },
-  { year: 2012, week: 25, headline: "Clash of Clans Becomes #1 Grossing Mobile Game. Mobile gaming sector heats up.", impact: 0.05, global: true }, // Easter Egg Context
-  { year: 2016, week: 25, headline: "Tencent Acquires Supercell for $8.6B - Early investors make millions.", impact: 0.04, global: true }, // Easter Egg Context
+  { year: 2012, week: 10, headline: "Blockcraft hits 20M copies sold. Indie gaming goes mainstream.", impact: 0.05, global: true },
+  { year: 2014, week: 36, headline: "Macrohard acquires Blockcraft for $2.5B. Early investors make a fortune.", impact: 0.04, global: true },
   { year: 2020, week: 9, headline: "Global 'Spicy Cough' Pandemic Declared. Toilet paper now worth more than gold.", impact: -0.15, global: true },
   { year: 2020, week: 11, headline: "Liquidity Crisis: Everyone is hoarding cash and hand sanitizer.", impact: -0.20, global: true },
   { year: 2020, week: 15, headline: "Fed Announces 'Infinite Money Glitch'. Printer goes BRRRRR.", impact: 0.12, global: true },
@@ -424,6 +422,22 @@ const INITIAL_STOCKS = [
   { symbol: 'TWRK', name: 'WeTwerk', sector: 'Real Estate', price: 2.50, volatility: 0.45, description: "Coworking space real estate startup.", history: [2.50] },
 ];
 
+// --- 🤖 AI CONFIG ---
+const LAVA_MODEL = "deepseek-chat";
+
+const callAI = async (prompt) => {
+  const response = await fetch("/api/lava/chat/completions", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: LAVA_MODEL,
+      messages: [{ role: "user", content: prompt }],
+    }),
+  });
+  const data = await response.json();
+  return data.choices?.[0]?.message?.content?.trim() || "";
+};
+
 // --- 🧠 AI & LOGIC HELPERS ---
 
 const getMarketSentiment = (year, week) => {
@@ -450,7 +464,6 @@ const getMockHeadlines = (count) => {
 };
 
 const generateMilestoneMessage = async (amount) => {
-    const apiKey = "";
     const prompt = `
       Write a short, serious, and impactful milestone congratulation message for a stock trading game.
       The player has just reached a net worth of $${amount.toLocaleString()}.
@@ -461,23 +474,13 @@ const generateMilestoneMessage = async (amount) => {
     `;
     
     try {
-        const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`,
-            {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
-            }
-        );
-        const data = await response.json();
-        return data.candidates?.[0]?.content?.parts?.[0]?.text.trim() || "Milestone achieved.";
+        return (await callAI(prompt)) || "Milestone achieved.";
     } catch (e) {
         return "You have reached a significant financial milestone.";
     }
 };
 
 const generateStartupPitch = async (netWorth, currentYear) => {
-  const apiKey = "";
   const baseAsk = Math.max(1000, Math.floor((netWorth * (0.05 + Math.random() * 0.15)) / 1000) * 1000);
   
   const prompt = `
@@ -502,23 +505,10 @@ const generateStartupPitch = async (netWorth, currentYear) => {
   `;
 
   try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
-      }
-    );
-    const data = await response.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    const text = await callAI(prompt);
     const cleanJson = text.replace(/```json/g, '').replace(/```/g, '').trim();
     const result = JSON.parse(cleanJson);
-    
-    return {
-        ...result,
-        ask: baseAsk 
-    };
+    return { ...result, ask: baseAsk };
   } catch (e) {
     return {
         founder: "Elon M.",
@@ -532,7 +522,6 @@ const generateStartupPitch = async (netWorth, currentYear) => {
 };
 
 const generateBoardQuestion = async (stock) => {
-  const apiKey = "";
   const prompt = `
     Generate a corporate board vote scenario.
     Company: ${stock.name} (${stock.symbol}) - ${stock.sector}
@@ -554,16 +543,7 @@ const generateBoardQuestion = async (stock) => {
   `;
 
   try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
-      }
-    );
-    const data = await response.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    const text = await callAI(prompt);
     const cleanJson = text.replace(/```json/g, '').replace(/```/g, '').trim();
     return JSON.parse(cleanJson);
   } catch (e) {
@@ -581,7 +561,6 @@ const generateBoardQuestion = async (stock) => {
 };
 
 const generateRelativeRequest = async (currentYear) => {
-  const apiKey = "";
   const prompt = `
     Generate a text message from a needy relative asking for money.
     Context: Stock trading game, year ${currentYear}.
@@ -600,19 +579,9 @@ const generateRelativeRequest = async (currentYear) => {
   `;
 
   try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
-      }
-    );
-    const data = await response.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    const text = await callAI(prompt);
     const cleanJson = text.replace(/```json/g, '').replace(/```/g, '').trim();
-    const result = JSON.parse(cleanJson);
-    return result;
+    return JSON.parse(cleanJson);
   } catch (e) {
     return {
         relation: "Cousin Vinny",
@@ -623,7 +592,6 @@ const generateRelativeRequest = async (currentYear) => {
 };
 
 const generatePersonaMessage = async (persona, context) => {
-  const apiKey = "";
   const prompt = `
     You are writing a short, text-message/pager style message.
     Sender Persona: ${persona}
@@ -631,18 +599,11 @@ const generatePersonaMessage = async (persona, context) => {
     Requirements: Max 25 words. Informal, gritty. No hashtags. Return ONLY the message text.
   `;
   try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`,
-      { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }) }
-    );
-    const data = await response.json();
-    return data.candidates?.[0]?.content?.parts?.[0]?.text.trim() || "Msg Corrupted.";
+    return (await callAI(prompt)) || "Msg Corrupted.";
   } catch (e) { return "Error receiving transmission."; }
 };
 
 const generateInsiderTip = async (stocks) => {
-  const apiKey = "";
-  
   // Pick random stock and random direction
   const stock = stocks[Math.floor(Math.random() * stocks.length)];
   const isUp = Math.random() > 0.5;
@@ -663,18 +624,11 @@ const generateInsiderTip = async (stocks) => {
   `;
 
   try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`,
-      { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }) }
-    );
-    const data = await response.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text.trim();
-    
+    const text = await callAI(prompt);
     return {
        text,
        symbol: stock.symbol,
-       isUp: isUp,
-       // The tip might be a lie, but this is the content of the tip
+       isUp,
        impact: isUp ? 0.15 : -0.15
     };
   } catch (e) {
@@ -688,7 +642,6 @@ const generateInsiderTip = async (stocks) => {
 };
 
 const fetchGeminiNews = async (stocks, portfolio, count, currentYear, excludedSymbols = []) => {
-  const apiKey = ""; 
   if (count === 0) return [];
   try {
     const availableStocks = stocks.filter(s => !excludedSymbols.includes(s.symbol));
@@ -721,12 +674,7 @@ const fetchGeminiNews = async (stocks, portfolio, count, currentYear, excludedSy
       ${chosenStocks.map(s => `- ${s.symbol}: ${s.name} (${s.sector}) - ${s.description}`).join('\n')}
       RETURN JSON ARRAY ONLY. Format: [{ "headline": "Text", "stockSymbol": "TICKER", "signal": "UP/DOWN", "percentage": float (0.01-0.30), "severity": "LOW/MED/HIGH" }]
     `;
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`,
-      { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }) }
-    );
-    const data = await response.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    const text = await callAI(prompt);
     const cleanJson = text.replace(/```json/g, '').replace(/```/g, '').trim();
     let parsedNews = JSON.parse(cleanJson);
     parsedNews = parsedNews.map(item => ({ ...item, percentage: item.percentage + (Math.random() * 0.009) }));
@@ -1444,11 +1392,11 @@ export default function App() {
   const [showMilestoneModal, setShowMilestoneModal] = useState(false);
   const [milestoneData, setMilestoneData] = useState(null);
   
-  // --- PRIVATE EQUITY & SUPERCELL ---
+  // --- PRIVATE EQUITY & BLOCKCRAFT ---
   const [privateEquity, setPrivateEquity] = useState([]); 
   const [pendingStartup, setPendingStartup] = useState(null); 
   const [showStartupModal, setShowStartupModal] = useState(false);
-  const [supercellRejected, setSupercellRejected] = useState(false);
+  const [blockraftRejected, setBlockraftRejected] = useState(false);
 
   // --- RELATIVE REQUESTS ---
   const [pendingRelative, setPendingRelative] = useState(null);
@@ -1604,17 +1552,16 @@ export default function App() {
   // --- PRIVATE EQUITY LOGIC ---
 
   const checkStartupEvents = async (year, week) => {
-      // 1. Check for Supercell Easter Egg (2009 Week 36)
-      if (year === 2009 && week === 36 && !supercellRejected) {
-          // ALWAYS TRIGGER (100% Chance) unless already rejected
+      // 1. Check for Blockcraft Easter Egg (2009 Week 36)
+      if (year === 2009 && week === 36 && !blockraftRejected) {
           setPendingStartup({
-              founder: "Ilkka Paananen",
-              company: "Supercell",
-              pitch: "I'm starting a mobile gaming company in Helsinki. We're going to make games that people play for years - games as a service, not one-hit wonders.",
+              founder: "Markus P.",
+              company: "Blockcraft",
+              pitch: "I'm building a sandbox game where players mine and craft in infinite voxel worlds. Releasing alpha this month. It's going to be massive.",
               ask: 5000,
               equity: 5,
               successChance: 78,
-              isSupercell: true
+              isBlockcraft: true
           });
           setShowStartupModal(true);
           return true;
@@ -1632,10 +1579,10 @@ export default function App() {
           return true; // Event triggered
       }
       
-      // Expiry Logic: Only clear random startups if ignored, mark Supercell as rejected
+      // Expiry Logic: Only clear random startups if ignored, mark Blockcraft as rejected
       if (pendingStartup && week !== targetWeek1 && week !== targetWeek2 && week !== 36) {
-          if (pendingStartup.isSupercell) {
-              setSupercellRejected(true);
+          if (pendingStartup.isBlockcraft) {
+              setBlockraftRejected(true);
           }
           setPendingStartup(null);
           setShowStartupModal(false);
@@ -1654,20 +1601,20 @@ export default function App() {
           const weeksSince = currentAbsWeek - acquiredAbsWeek;
           const lastWeeksSince = lastAbsWeek - acquiredAbsWeek;
 
-          // Update Valuation for Supercell (Annual check based on map)
+          // Update Valuation for Blockcraft (Annual check based on map)
           let currentValuation = company.currentValuation;
-          if (company.isSupercell) {
-             const growthData = SUPERCELL_GROWTH[currentYear];
+          if (company.isBlockcraft) {
+             const growthData = BLOCKCRAFT_GROWTH[currentYear];
              if (growthData && growthData.value !== currentValuation) {
                  currentValuation = growthData.value;
              }
           }
 
-          // Trigger Dividend/Growth if 13-week boundary crossed (ROBUST METHOD FROM DOC 1)
+          // Trigger Dividend/Growth if 13-week boundary crossed
           if (weeksSince > 0 && Math.floor(weeksSince / 13) > Math.floor(lastWeeksSince / 13)) {
-              
-              // SUPERCELL DIVIDEND
-              if (company.isSupercell) {
+
+              // BLOCKCRAFT DIVIDEND
+              if (company.isBlockcraft) {
                   const divAmount = currentValuation * 0.02; // 2% quarterly
                   dividendsTotal += divAmount;
                   return { ...company, currentValuation };
